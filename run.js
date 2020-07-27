@@ -79,7 +79,7 @@ client.on('message', msg => {
 				treeAssembly += "├─" + category + "\n";
 				for(let channelIndex = 0; channelIndex < tree[category].length; channelIndex++)
 				{
-					treeAssembly += " \|\t" + (channelIndex + 1 == tree[category].length ? "└" : "├─") + tree[category][channelIndex] + "\n";
+					treeAssembly += " \|\t" + (channelIndex + 1 == tree[category].length ? "└─" : "├─") + tree[category][channelIndex] + "\n";
 				}
 			}
 			msg.channel.send(treeAssembly);
