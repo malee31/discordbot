@@ -60,7 +60,29 @@ client.on('message', msg => {
 				member.send("Channel Broadcast: " + args.join(" "));
 				sentTo.push(member.username + "#" + member.discriminator);
 			});
-			msg.author.send("Sent message to: \n" + sentTo.join(",\t\n"));
+			msg.author.send("Sent message to: \n> " + sentTo.join(",\n> "));
+		break;
+		case "tree":
+		case "test":
+			let tree = {};
+			msg.guild.channels.cache.forEach((channel, key, cache) => {
+				if(channel.type == "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
+				else if (channel.type !== "category")
+				{
+					console.log("Checking", channel, "Got", cache.get(channel.parentID));
+					tree[cache.get(channel.parentID).name].push(channel.name);
+				}
+			});
+			let treeAssembly = msg.guild.name + "\n";
+			for(let category in tree)
+			{
+				treeAssembly += "├─" + category + "\n";
+				for(let channelIndex = 0; channelIndex < tree[category].length; channelIndex++)
+				{
+					treeAssembly += " \|\t" + (channelIndex + 1 == tree[category].length ? "└" : "├─") + tree[category][channelIndex] + "\n";
+				}
+			}
+			msg.channel.send(treeAssembly);
 		break;
 		/*case "spam":
 			let spamLimit = parseInt(args[0]);
@@ -79,9 +101,6 @@ client.on('message', msg => {
 				msg.reply(args.join(" "));
 			}
 		break;*/
-		case "test":
-			
-		break;
 		default:
 			msg.reply("I have no idea what you are trying to say");
 	}
