@@ -5,15 +5,8 @@ const MAX_SPAM = 10;
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	//console.log(client.guilds.cache.entries().next().value[1].members.cache);
-	for(let member of client.guilds.cache.entries().next().value[1].members.cache)
-	{
-		//console.log(member[1].user);
-		if(!member[1].user.bot)
-		{
-			//member[1].user.send("Greetings");
-		}
-	}
+	client.options.ws.game = "Being updated";
+	console.log(client.options);
 });
 
 client.on('message', msg => {
@@ -63,7 +56,6 @@ client.on('message', msg => {
 			msg.author.send("Sent message to: \n> " + sentTo.join(",\n> "));
 		break;
 		case "tree":
-		case "test":
 			let tree = {};
 			msg.guild.channels.cache.forEach((channel, key, cache) => {
 				if(channel.type == "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
@@ -83,6 +75,21 @@ client.on('message', msg => {
 				}
 			}
 			msg.channel.send(treeAssembly);
+		break;
+		case "regex":
+		case "test":
+			let regex = new RegExp(args[0]);
+			console.log("Regexp: ", regex);
+			let response = "";
+			let userMatches = msg.guild.members.cache.filter(member => {
+				return !member.user.bot && regex.test(`${member.user.username}#${member.user.discriminator}`);
+			}).forEach(match => {
+				response += `> ${match.user.username}#${match.user.discriminator}\n`;
+			});
+			msg.channel.send(`${response}All matched the expression`);
+		break;
+		case "celebrate":
+			msg.channel.send("Yay!!! I worked!!!");
 		break;
 		/*case "spam":
 			let spamLimit = parseInt(args[0]);
