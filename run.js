@@ -5,8 +5,7 @@ const MAX_SPAM = 10;
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	client.options.ws.game = "Being updated";
-	console.log(client.options);
+	client.user.setActivity("You While Being Updated", {type: "LISTENING"});
 });
 
 client.on('message', msg => {
@@ -27,8 +26,7 @@ client.on('message', msg => {
 		break;
 		case "dm":
 			msg.reply("Of course, on it");
-			msg.author.send("Here's the DM you asked for: \"" + args.join(" ") + "\"");
-			msg.author.send("Here's your information: " + JSON.stringify(msg.author));
+			msg.author.send(`Here's the DM you asked for: "${args.join(" ")}"\nHere's your information: ${JSON.stringify(msg.author)}`);
 		break;
 		case "shutdown":
 			console.log("Shutdown requested by: " + msg.author.username + "#" + msg.author.discriminator);
