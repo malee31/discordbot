@@ -4,7 +4,8 @@
   "description": "A Discord Bot written in NodeJS",
   "main": "run.js",
   "scripts": {
-    "test": "node run.js"
+    "test": "node run.js > testing/output.txt",
+	 "run": "node run.js"
   },
   "repository": {
     "type": "git",
