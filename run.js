@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const config = require("./config.js");
+const commands = require("./command.js");
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -12,84 +13,39 @@ client.on('message', msg => {
 	if(msg.author.bot || !msg.content.startsWith(config.prefix)) return;
 	let args = msg.content.slice(config.prefix.length).trim().split(" ");
 	let command = config.aliases(args.shift().toLowerCase());
+	let joined = args.join(" ");
 	switch(command)
 	{
 		case "greet":
-			msg.author.send("Nice to meet you!");
+			commands.greet(msg);
 		break;
 		case "say":
-			msg.channel.send(args.join(" "));
+			commands.say(msg, joined);
 		break;
 		case "echo":
-			msg.reply(args.join(" "));
+			commands.echo(msg, joined);
 		break;
 		case "dm":
-			msg.reply("Of course, on it");
-			msg.author.send(`Here's the DM you asked for: "${args.join(" ")}"\nHere's your information: ${JSON.stringify(msg.author)}`);
+			commands.dm(msg, joined);
 		break;
 		case "shutdown":
-			console.log(`Shutdown requested by: ${msg.author.username}#${msg.author.discriminator}`);
-			msg.reply(":(").then(() => {
-				process.exit();
-			});
-		break;
-		case "tts":
-			msg.channel.send("I speak! Greetings.", {tts: true});
+			commands.shutdown(msg);
 		break;
 		case "dmall":
-			//if(!msg.user)
-			if(!msg.member.hasPermission("ADMINISTRATOR")) {
-				msg.reply("You need administrator permissions to use that command");
-				return;
-			}
-			let sentTo = [];
-			msg.guild.members.cache.forEach(member => {
-				member = member.user;
-				if(member.bot) return;
-				member.send("Channel Broadcast: " + args.join(" "));
-				sentTo.push(member.username + "#" + member.discriminator);
-			});
-			msg.author.send("Sent message to: \n> " + sentTo.join(",\n> "));
+			commands.dmall(msg, joined);
 		break;
 		case "baretree":
+			commands.tree(msg, true);
+		break;
 		case "tree":
-			let tree = {};
-			msg.guild.channels.cache.forEach((channel, key, cache) => {
-				if(channel.type == "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
-				else if (channel.type !== "category")
-				{
-					//console.log("Checking", channel, "Got", cache.get(channel.parentID));
-					tree[cache.get(channel.parentID).name].push(channel.name);
-				}
-			});
-			let treeAssembly = msg.guild.name + "\n";
-			for(let category in tree)
-			{
-				if(command !== "baretree") treeAssembly += "├─";
-				else treeAssembly += "\t";
-				treeAssembly += `${category}\n`;
-				for(let channelIndex = 0; channelIndex < tree[category].length; channelIndex++)
-				{
-					if(command !== "baretree") treeAssembly += ` \|\t${channelIndex + 1 == tree[category].length ? "└─" : "├─"}${tree[category][channelIndex]}\n`;
-					else treeAssembly += `\t\t${tree[category][channelIndex]}\n`;
-				}
-			}
-			msg.channel.send(treeAssembly);
+			commands.tree(msg);
 		break;
 		case "regex":
-		case "test":
-			let regex = new RegExp(args[0]);
-			console.log("Regexp: ", regex);
-			let response = "";
-			let userMatches = msg.guild.members.cache.filter(member => {
-				return !member.user.bot && regex.test(`${member.user.username}#${member.user.discriminator}`);
-			}).forEach(match => {
-				response += `> ${match.user.username}#${match.user.discriminator}\n`;
-			});
-			msg.channel.send(`${response}All matched the expression`);
+			commands.regex(msg, args[0]);
 		break;
+		case "test":
 		case "celebrate":
-			msg.channel.send("Yay!!! I worked!!!");
+			commands.say("Yay!!! I worked properly!!!");
 		break;
 		/*case "spam":
 			let spamLimit = parseInt(args[0]);
