@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const prefix = ">";
-const MAX_SPAM = 10;
+const config = require("./config.js");
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -10,9 +9,9 @@ client.on('ready', () => {
 
 client.on('message', msg => {
 	//console.log(msg);
-	if(msg.author.bot || !msg.content.startsWith(prefix)) return;
-	let args = msg.content.slice(prefix.length).trim().split(" ");
-	let command = args.shift().toLowerCase();
+	if(msg.author.bot || !msg.content.startsWith(config.prefix)) return;
+	let args = msg.content.slice(config.prefix.length).trim().split(" ");
+	let command = config.aliases(args.shift().toLowerCase());
 	switch(command)
 	{
 		case "greet":
@@ -29,7 +28,7 @@ client.on('message', msg => {
 			msg.author.send(`Here's the DM you asked for: "${args.join(" ")}"\nHere's your information: ${JSON.stringify(msg.author)}`);
 		break;
 		case "shutdown":
-			console.log("Shutdown requested by: " + msg.author.username + "#" + msg.author.discriminator);
+			console.log(`Shutdown requested by: ${msg.author.username}#${msg.author.discriminator}`);
 			msg.reply(":(").then(() => {
 				process.exit();
 			});
@@ -37,7 +36,6 @@ client.on('message', msg => {
 		case "tts":
 			msg.channel.send("I speak! Greetings.", {tts: true});
 		break;
-		case "dm-all":
 		case "dmall":
 			//if(!msg.user)
 			if(!msg.member.hasPermission("ADMINISTRATOR")) {
@@ -53,8 +51,6 @@ client.on('message', msg => {
 			});
 			msg.author.send("Sent message to: \n> " + sentTo.join(",\n> "));
 		break;
-		case "bare-tree":
-			command = "baretree";
 		case "baretree":
 		case "tree":
 			let tree = {};
@@ -62,7 +58,7 @@ client.on('message', msg => {
 				if(channel.type == "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
 				else if (channel.type !== "category")
 				{
-					console.log("Checking", channel, "Got", cache.get(channel.parentID));
+					//console.log("Checking", channel, "Got", cache.get(channel.parentID));
 					tree[cache.get(channel.parentID).name].push(channel.name);
 				}
 			});
@@ -70,11 +66,12 @@ client.on('message', msg => {
 			for(let category in tree)
 			{
 				if(command !== "baretree") treeAssembly += "├─";
-				treeAssembly += category + "\n";
+				else treeAssembly += "\t";
+				treeAssembly += `${category}\n`;
 				for(let channelIndex = 0; channelIndex < tree[category].length; channelIndex++)
 				{
 					if(command !== "baretree") treeAssembly += ` \|\t${channelIndex + 1 == tree[category].length ? "└─" : "├─"}${tree[category][channelIndex]}\n`;
-					else treeAssembly += `\t${tree[category][channelIndex]}\n`;
+					else treeAssembly += `\t\t${tree[category][channelIndex]}\n`;
 				}
 			}
 			msg.channel.send(treeAssembly);
@@ -102,7 +99,7 @@ client.on('message', msg => {
 			else
 			{
 				args = args.slice(1);
-				spamLimit = Math.min(spamLimit, MAX_SPAM);
+				spamLimit = Math.min(spamLimit, config.maxSpam);
 				console.log(args);
 			}
 			for(let spamNumber = 0; spamNumber < spamLimit; spamNumber++)
