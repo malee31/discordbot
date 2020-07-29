@@ -53,6 +53,9 @@ client.on('message', msg => {
 			});
 			msg.author.send("Sent message to: \n> " + sentTo.join(",\n> "));
 		break;
+		case "bare-tree":
+			command = "baretree";
+		case "baretree":
 		case "tree":
 			let tree = {};
 			msg.guild.channels.cache.forEach((channel, key, cache) => {
@@ -66,10 +69,12 @@ client.on('message', msg => {
 			let treeAssembly = msg.guild.name + "\n";
 			for(let category in tree)
 			{
-				treeAssembly += "├─" + category + "\n";
+				if(command !== "baretree") treeAssembly += "├─";
+				treeAssembly += category + "\n";
 				for(let channelIndex = 0; channelIndex < tree[category].length; channelIndex++)
 				{
-					treeAssembly += " \|\t" + (channelIndex + 1 == tree[category].length ? "└─" : "├─") + tree[category][channelIndex] + "\n";
+					if(command !== "baretree") treeAssembly += ` \|\t${channelIndex + 1 == tree[category].length ? "└─" : "├─"}${tree[category][channelIndex]}\n`;
+					else treeAssembly += `\t${tree[category][channelIndex]}\n`;
 				}
 			}
 			msg.channel.send(treeAssembly);
