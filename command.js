@@ -1,3 +1,5 @@
+const config = require("./config.js");
+
 module.exports = {
 	greet: msg => {
 		msg.author.send("Nice to meet you!");
@@ -7,6 +9,27 @@ module.exports = {
 	},
 	echo: (msg, text) => {
 		msg.reply(text);
+	},
+	spam: (msg, args) => {
+		console.log("Run");
+		let spamLimit = parseInt(args[0]);
+		let text = "";
+		if(typeof spamLimit !== "number")
+		{
+			spamLimit = config.minSpam;
+			text = args.join(" ");
+		}
+		else
+		{
+			text = args.slice(1).join(" ");
+			if(isNaN(spamLimit) || spamLimit <= 0 || text == "") return;
+		}
+		spamLimit = Math.min(spamLimit, config.maxSpam);
+		console.log(`Sending ${spamLimit} ${text} to the whole channel`);
+		for(let spamNumber = 0; spamNumber < spamLimit; spamNumber++)
+		{
+			msg.reply(text);
+		}
 	},
 	dm: (msg, text) => {
 			msg.reply("Of course, on it");

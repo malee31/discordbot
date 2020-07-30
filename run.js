@@ -10,60 +10,39 @@ client.on('ready', () => {
 
 client.on('message', msg => {
 	//console.log(msg);
+	console.log("MSG!", msg);
 	if(msg.author.bot || !msg.content.startsWith(config.prefix)) return;
 	let args = msg.content.slice(config.prefix.length).trim().split(" ");
 	let command = config.aliases(args.shift().toLowerCase());
 	let joined = args.join(" ");
+	if(typeof commands[command] == "function") commands[command](msg, args, joined);
 	switch(command)
 	{
 		case "greet":
-			commands.greet(msg);
+		case "shutdown":
+		case "tree":
+			commands[command](msg);
 		break;
 		case "say":
-			commands.say(msg, joined);
-		break;
 		case "echo":
-			commands.echo(msg, joined);
-		break;
 		case "dm":
-			commands.dm(msg, joined);
-		break;
-		case "shutdown":
-			commands.shutdown(msg);
-		break;
 		case "dmall":
-			commands.dmall(msg, joined);
+			commands[command](msg, joined);
 		break;
 		case "baretree":
 			commands.tree(msg, true);
 		break;
-		case "tree":
-			commands.tree(msg);
-		break;
 		case "regex":
 			commands.regex(msg, args[0]);
+		break;
+		case "spam":
+			console.log("spamming");
+			commands.spam(msg, args);
 		break;
 		case "test":
 		case "celebrate":
 			commands.say("Yay!!! I worked properly!!!");
 		break;
-		/*case "spam":
-			let spamLimit = parseInt(args[0]);
-			if(isNaN(spamLimit)) {
-				spamLimit = 0;
-			}
-			else
-			{
-				args = args.slice(1);
-				spamLimit = Math.min(spamLimit, config.maxSpam);
-				console.log(args);
-			}
-			for(let spamNumber = 0; spamNumber < spamLimit; spamNumber++)
-			{
-				if(args.length < 1) break;
-				msg.reply(args.join(" "));
-			}
-		break;*/
 		default:
 			msg.reply("I have no idea what you are trying to say");
 	}

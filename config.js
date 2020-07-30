@@ -1,6 +1,7 @@
 module.exports = {
 	aliases: aliases,
 	prefix: ">",
+	minSpam: 0,
 	maxSpam: 10
 };
 
