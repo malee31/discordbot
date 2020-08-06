@@ -9,13 +9,10 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-	//console.log(msg);
-	console.log("MSG!", msg);
 	if(msg.author.bot || !msg.content.startsWith(config.prefix)) return;
 	let args = msg.content.slice(config.prefix.length).trim().split(" ");
 	let command = config.aliases(args.shift().toLowerCase());
 	let joined = args.join(" ");
-	if(typeof commands[command] == "function") commands[command](msg, args, joined);
 	switch(command)
 	{
 		case "greet":
@@ -36,12 +33,11 @@ client.on('message', msg => {
 			commands.regex(msg, args[0]);
 		break;
 		case "spam":
-			console.log("spamming");
 			commands.spam(msg, args);
 		break;
 		case "test":
 		case "celebrate":
-			commands.say("Yay!!! I worked properly!!!");
+			commands.say(msg, "Yay!!! I worked properly!!!");
 		break;
 		default:
 			msg.reply("I have no idea what you are trying to say");

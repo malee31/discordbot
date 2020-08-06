@@ -71,6 +71,7 @@ module.exports = {
 				else treeAssembly += `\t\t${tree[category][channelIndex]}\n`;
 			}
 		}
+		console.log(treeAssembly)
 		msg.channel.send(treeAssembly);
 	},
 	regex: (msg, regexString) => {
