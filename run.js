@@ -9,7 +9,11 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-	if(msg.author.bot || !msg.content.startsWith(config.prefix)) return;
+	const hasText = Boolean(msg.content);
+	const hasImage = msg.attachments.size !== 0;
+	const hasEmbed = msg.embeds.length !== 0;
+	if(msg.author.bot || !(hasText || hasImage || hasEmbed) || !msg.content.startsWith(config.prefix)) return;
+
 	let args = msg.content.slice(config.prefix.length).trim().split(" ");
 	let command = config.aliases(args.shift().toLowerCase());
 	let joined = args.join(" ");

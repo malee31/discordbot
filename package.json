@@ -1,28 +1,28 @@
 {
-  "name": "discordbot",
-  "version": "1.0.0",
-  "description": "A Discord Bot written in NodeJS",
-  "main": "run.js",
-  "scripts": {
-    "test": "node run.js > testing/output.txt",
-	 "run": "node run.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/malee31/discordbot.git"
-  },
-  "keywords": [
-    "Discord",
-    "bot",
-    "NodeJS"
-  ],
-  "author": "Marvin Lee",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/malee31/discordbot/issues"
-  },
-  "homepage": "https://github.com/malee31/discordbot#readme",
-  "dependencies": {
-    "discord.js": "^12.2.0"
-  }
+	"name": "discordbot",
+	"version": "1.0.0",
+	"description": "A Discord Bot written in NodeJS",
+	"main": "run.js",
+	"scripts": {
+		"test": "node run.js > testing/output.txt",
+		"run": "node run.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/malee31/discordbot.git"
+	},
+	"keywords": [
+		"Discord",
+		"NodeJS",
+		"bot"
+	],
+	"author": "Marvin Lee",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/malee31/discordbot/issues"
+	},
+	"homepage": "https://github.com/malee31/discordbot#readme",
+	"dependencies": {
+		"discord.js": "^12.2.0"
+	}
 }
