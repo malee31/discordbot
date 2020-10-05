@@ -85,6 +85,9 @@ module.exports = {
 		});
 		msg.channel.send(`${response}All matched the expression`);
 	},
+	profile: (msg) => {
+		msg.channel.send(`${msg.author.displayAvatarURL({ dynamic: true })}`);
+	},
 	shutdown: msg => {
 		console.log(`Shutdown requested by: ${msg.author.username}#${msg.author.discriminator}`);
 		msg.reply(":(").then(() => {

@@ -14,7 +14,7 @@ client.on('message', msg => {
 	const hasEmbed = msg.embeds.length !== 0;
 	if(msg.author.bot || !(hasText || hasImage || hasEmbed) || !msg.content.startsWith(config.prefix)) return;
 
-	let args = msg.content.slice(config.prefix.length).trim().split(" ");
+	let args = msg.content.slice(config.prefix.length).trim().split(/ +/g);
 	let command = config.aliases(args.shift().toLowerCase());
 	let joined = args.join(" ");
 	switch(command)
@@ -22,6 +22,7 @@ client.on('message', msg => {
 		case "greet":
 		case "shutdown":
 		case "tree":
+		case "profile":
 			commands[command](msg);
 		break;
 		case "say":
@@ -40,6 +41,7 @@ client.on('message', msg => {
 			commands.spam(msg, args);
 		break;
 		case "test":
+			console.log(joined.split("\n"));
 		case "celebrate":
 			commands.say(msg, "Yay!!! I worked properly!!!");
 		break;
