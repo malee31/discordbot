@@ -1,7 +1,8 @@
-const Discord = require('discord.js');
+const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.js");
 const commands = require("./command.js");
+const argParse = require("./arguments.js");
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -29,7 +30,7 @@ client.on('message', msg => {
 	for(let runningCommand = 0; runningCommand < subcommands.length; runningCommand++) {
 		let command = subcommands[runningCommand].command;
 		let joined = subcommands[runningCommand].args;
-		let args = subcommands[runningCommand].args.split(" ");
+		let args = argParse(subcommands[runningCommand].args);
 		switch(command)
 		{
 			case "greet":

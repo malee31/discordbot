@@ -1,6 +1,7 @@
 module.exports = {
 	aliases: aliases,
 	prefix: ">",
+	substitutionPlaceholder: "substitutionplaceholder",
 	minSpam: 0,
 	maxSpam: 10
 };
