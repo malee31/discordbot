@@ -13,12 +13,17 @@ module.exports = function parseArguments(argArray, parsePattern) {
 	let parse = (bit, index) => {
 		switch(bit) {
 			case 'n':
+				if(isNaN(argArray[index])) console.log("Not able to parse as number, defaulted to string: " + argArray[index]);
+				else argArray[index] = Number(argArray[index]);
+			break;
+			case 'i':
+				if(isNaN(argArray[index])) console.log("Not able to parse as integer, defaulted to string: " + argArray[index]);
+				else argArray[index] = Number.parseInt(argArray[index]);
+			break;
 			case 'd':
 			case 'f':
-				if(!isNaN(argArray[index])) argArray[index] = Number(argArray[index]);
-				else {
-					console.log("Not able to parse as number: " + argArray[index]);
-				}
+				if(isNaN(argArray[index])) console.log("Not able to parse as float/decimal, defaulted to string: " + argArray[index]);
+				else argArray[index] = Number.parseFloat(argArray[index]);
 			break;
 			/*case 's':
 			default:*/
