@@ -81,6 +81,5 @@ module.exports = function parseArguments(argArray, parsePattern) {
 		}
 	}
 
-	console.log(argArray);
 	return argArray;
 }

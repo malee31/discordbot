@@ -64,12 +64,12 @@ module.exports = {
 				else treeAssembly += `\t\t${tree[category][channelIndex]}\n`;
 			}
 		}
-		console.log(treeAssembly)
+		//console.log(treeAssembly)
 		msg.channel.send(treeAssembly);
 	},
 	regex: (msg, command) => {
 		let regex = new RegExp(command.parsed[0]);
-		console.log("Regexp: ", regex);
+		//console.log("Regexp: ", regex);
 		let response = "";
 		let userMatches = msg.guild.members.cache.filter(member => {
 			return !member.user.bot && regex.test(`${member.user.username}#${member.user.discriminator}`);
