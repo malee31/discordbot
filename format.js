@@ -12,6 +12,31 @@ module.exports = function parseArguments(argArray, parsePattern) {
 	let expandAs = '';
 	let parse = (bit, index) => {
 		switch(bit) {
+			case 'b':
+				switch(argArray[index].trim().toLowerCase()) {
+					case "true":
+					case "t":
+					case "on":
+					case "success":
+					case "correct":
+					case "yes":
+					case "y":
+					case "1":
+						argArray[index] = true;
+					break;
+					case "false":
+					case "f":
+					case "off":
+					case "fail":
+					case "wrong":
+					case "no":
+					case "n":
+					case "0":
+						argArray[index] = false;
+					default:
+						console.log("Cannot parse into boolean. Skipping");
+				}
+			break;
 			case 'n':
 				if(isNaN(argArray[index])) console.log("Not able to parse as number, defaulted to string: " + argArray[index]);
 				else argArray[index] = Number(argArray[index]);

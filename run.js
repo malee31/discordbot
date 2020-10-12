@@ -3,13 +3,14 @@ const client = new Discord.Client();
 const config = require("./config.js");
 const commands = require("./command.js");
 const argParse = require("./arguments.js");
+const argFormat = require("./format.js");
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity("You While Being Updated", {type: "LISTENING"});
 });
 
-client.on('message', msg => {
+client.on('message', async msg => {
 	const hasText = Boolean(msg.content);
 	const hasImage = msg.attachments.size !== 0;
 	const hasEmbed = msg.embeds.length !== 0;
@@ -23,45 +24,15 @@ client.on('message', msg => {
 		let processCommand = subcommands[commandNum].trim().split(/ |\n+/g);
 		subcommands[commandNum] = {
 			command: config.aliases(processCommand.shift().toLowerCase()),
-			args: processCommand.join(" ").trim()
+			args: processCommand.join(" ").trim(),
+			parsed: argParse(processCommand.join(" "))
 		};
 	}
 
 	for(let runningCommand = 0; runningCommand < subcommands.length; runningCommand++) {
-		let command = subcommands[runningCommand].command;
-		let joined = subcommands[runningCommand].args;
-		let args = argParse(subcommands[runningCommand].args);
-		switch(command)
-		{
-			case "greet":
-			case "shutdown":
-			case "tree":
-			case "profile":
-				commands[command](msg);
-			break;
-			case "say":
-			case "echo":
-			case "dm":
-			case "dmall":
-				commands[command](msg, joined);
-			break;
-			case "baretree":
-				commands.tree(msg, true);
-			break;
-			case "regex":
-				commands.regex(msg, args[0]);
-			break;
-			case "spam":
-				commands.spam(msg, args);
-			break;
-			case "test":
-				console.log(joined.match(/'([^']+)'/g));
-			case "celebrate":
-				commands.say(msg, "Yay!!! I worked properly!!!");
-			break;
-			default:
-				msg.reply("I have no idea what you are trying to say");
-		}
+		let subcommand = subcommands[runningCommand];
+		if(commands[subcommand.command]) commands[subcommand.command](msg, subcommand);
+		else msg.reply("I have no idea what you are trying to say");
 	}
 });
 
