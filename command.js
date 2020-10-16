@@ -17,8 +17,7 @@ module.exports = {
 		if(typeof format[0] == "number") spamCount = Math.min(format.shift(), config.maxSpam);
 		let text = format.join();
 		console.log(`Sending ${spamCount} ${text} to the whole channel`);
-		for(let spamNumber = 0; spamNumber < spamCount; spamNumber++)
-		{
+		for(let spamNumber = 0; spamNumber < spamCount; spamNumber++) {
 			msg.reply(text);
 		}
 	},
@@ -77,6 +76,18 @@ module.exports = {
 			response += `> ${match.user.username}#${match.user.discriminator}\n`;
 		});
 		msg.channel.send(`${response}All matched the expression`);
+	},
+	targetdm: (msg, command) => {
+		let format = argFormat(command.parsed, "s+");
+		let searchedUser = format[0];
+
+		let userMatches = msg.guild.members.cache.filter(member => {
+			return `${member.user.username}#${member.user.discriminator}` == searchedUser;
+		}).forEach(match => {
+			match.user.send(format.slice(1).join(" "));
+		});
+		msg.channel.send("DM sent");
+		
 	},
 	profile: (msg) => {
 		msg.channel.send(`${msg.author.displayAvatarURL({ dynamic: true })}`);
