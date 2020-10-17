@@ -73,7 +73,8 @@ module.exports = {
 		let userMatches = msg.guild.members.cache.filter(member => {
 			return !member.user.bot && regex.test(`${member.user.username}#${member.user.discriminator}`);
 		}).forEach(match => {
-			response += `> ${match.user.username}#${match.user.discriminator}\n`;
+			response += `> ${match.user.username}#${match.user.discriminator}: `;
+			response += `> ${match.user.id}\n`;
 		});
 		msg.channel.send(`${response}All matched the expression`);
 	},
@@ -97,5 +98,8 @@ module.exports = {
 		msg.reply(":(").then(() => {
 			process.exit();
 		});
+	},
+	test: (msg, command) => {
+		console.log(msg.author)
 	}
 }
