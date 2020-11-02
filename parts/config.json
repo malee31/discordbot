@@ -1,0 +1,6 @@
+{
+	"prefix": ">",
+	"substitutionPlaceholder": "substitutionplaceholder",
+	"minSpam": 0,
+	"maxSpam": 10
+}

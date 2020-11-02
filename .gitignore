@@ -1,5 +1,6 @@
 # Testing Files and Credentials
 testing/
+.env
 
 # Node Files
 node_modules/
@@ -7,3 +8,6 @@ node_modules/
 # ViM Files
 *.swo
 *.swp
+
+# Intellij Files
+.idea/

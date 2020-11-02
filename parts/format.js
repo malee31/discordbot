@@ -1,5 +1,5 @@
 module.exports = function parseArguments(argArray, parsePattern) {
-	if(!Array.isArray(argArray) || argArray.length == 0) return [];
+	if(!Array.isArray(argArray) || argArray.length === 0) return [];
 	if(typeof parsePattern == "string") parsePattern = parsePattern.split("");
 	else if(!Array.isArray(parsePattern)) {
 		console.log("Provided parse pattern not an array or string. Returning original arguments");
@@ -23,7 +23,7 @@ module.exports = function parseArguments(argArray, parsePattern) {
 					case "y":
 					case "1":
 						argArray[index] = true;
-					break;
+						break;
 					case "false":
 					case "f":
 					case "off":
@@ -33,23 +33,24 @@ module.exports = function parseArguments(argArray, parsePattern) {
 					case "n":
 					case "0":
 						argArray[index] = false;
+						break;
 					default:
 						console.log("Cannot parse into boolean. Skipping");
 				}
-			break;
+				break;
 			case 'n':
 				if(isNaN(argArray[index])) console.log("Not able to parse as number, defaulted to string: " + argArray[index]);
 				else argArray[index] = Number(argArray[index]);
-			break;
+				break;
 			case 'i':
 				if(isNaN(argArray[index])) console.log("Not able to parse as integer, defaulted to string: " + argArray[index]);
 				else argArray[index] = Number.parseInt(argArray[index]);
-			break;
+				break;
 			case 'd':
 			case 'f':
 				if(isNaN(argArray[index])) console.log("Not able to parse as float/decimal, defaulted to string: " + argArray[index]);
 				else argArray[index] = Number.parseFloat(argArray[index]);
-			break;
+				break;
 			/*case 's':
 			default:*/
 		}
@@ -57,7 +58,7 @@ module.exports = function parseArguments(argArray, parsePattern) {
 
 	while(parsePattern.length > 0) {
 		let bit = parsePattern.shift();
-		if(parsePattern.length > 0 && parsePattern[0] == '+') {
+		if(parsePattern.length > 0 && parsePattern[0] === '+') {
 			expandAs = bit;
 			break;
 		}
