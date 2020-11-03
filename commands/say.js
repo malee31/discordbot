@@ -1,7 +1,6 @@
 module.exports = {
 	name: "say",
-	aliases: ["echo"],
-	description: "The bot will repeat what you tell it to say",
+	description: "The bot will DM you what you tell it to say",
 	execute(message, args) {
 		let promises = [];
 		promises.push(message.reply("Of course, on it"));
