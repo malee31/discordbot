@@ -13,8 +13,9 @@ module.exports = {
 		message.guild.members.cache.forEach(member => {
 			member = member.user;
 			if(member.bot) return;
-			member.send("Channel Broadcast: " + command.args);
 			sentTo.push(member.username + "#" + member.discriminator);
+			return member.send("Server Broadcast: " + args.join(" "));
 		});
+		console.log(`Sent ${args.join(" ")} to entire ${message.guild.name} server:\n${sentTo.join("\n")}`);
 	},
 };

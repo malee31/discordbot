@@ -1,3 +1,4 @@
+// noinspection SpellCheckingInspection
 module.exports = {
 	name: "tree",
 	description: "Sends the channel structure of the server",
@@ -6,7 +7,7 @@ module.exports = {
 		let bare = false;
 		let tree = {};
 		message.guild.channels.cache.forEach((channel, key, cache) => {
-			if(channel.type == "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
+			if(channel.type === "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
 			else if(channel.type !== "category") {
 				//console.log("Checking", channel, "Got", cache.get(channel.parentID));
 				tree[cache.get(channel.parentID).name].push(channel.name);
@@ -18,7 +19,7 @@ module.exports = {
 			else treeAssembly += "\t";
 			treeAssembly += `${category}\n`;
 			for(let channelIndex = 0; channelIndex < tree[category].length; channelIndex++) {
-				if(!bare) treeAssembly += ` \|\t${channelIndex + 1 == tree[category].length ? "└─" : "├─"}${tree[category][channelIndex]}\n`;
+				if(!bare) treeAssembly += ` \|\t${channelIndex + 1 === tree[category].length ? "└─" : "├─"}${tree[category][channelIndex]}\n`;
 				else treeAssembly += `\t\t${tree[category][channelIndex]}\n`;
 			}
 		}
