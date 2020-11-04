@@ -2,9 +2,10 @@
 module.exports = {
 	name: "tree",
 	description: "Sends the channel structure of the server",
-	execute(message) {
+	usage: "[bare]",
+	execute(message, args) {
 		//baretree has been disabled due to reconstruction
-		let bare = false;
+		let bare = args[0].toLowerCase() === "bare";
 		let tree = {};
 		message.guild.channels.cache.forEach((channel, key, cache) => {
 			if(channel.type === "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
