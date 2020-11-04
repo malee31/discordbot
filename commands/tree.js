@@ -1,11 +1,9 @@
-// noinspection SpellCheckingInspection
 module.exports = {
 	name: "tree",
 	description: "Sends the channel structure of the server",
-	usage: "[bare]",
+	usage: "[bare (optional)]",
 	execute(message, args) {
-		//baretree has been disabled due to reconstruction
-		let bare = args[0].toLowerCase() === "bare";
+		let bare = args[0] && args[0].toLowerCase() === "bare";
 		let tree = {};
 		message.guild.channels.cache.forEach((channel, key, cache) => {
 			if(channel.type === "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
