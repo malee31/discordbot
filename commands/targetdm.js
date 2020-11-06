@@ -5,7 +5,7 @@ module.exports = {
 		let searchedUser = args[0];
 
 		message.guild.members.cache.filter(member => {
-			return `${member.user.username}#${member.user.discriminator}` === searchedUser;
+			return `${member.user.username}#${member.user.discriminator}` === searchedUser || member.user.id === searchedUser.match(/(?<=^<@!?)\d+(?=>$)/)[0];
 		}).forEach(match => {
 			return match.user.send(args.slice(1).join(" "));
 		});
