@@ -6,7 +6,6 @@ module.exports = {
 	usage: "'[Title]' '[Description]'",
 	validate(message, args) {
 		return Boolean(args[1]);
-
 	},
 	execute(message, args) {
 		let textEmbed = new Discord.MessageEmbed()

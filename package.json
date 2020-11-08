@@ -5,7 +5,7 @@
 	"main": "run.js",
 	"scripts": {
 		"test": "node run.js > testing/output.txt",
-		"run": "node run.js"
+		"start": "node run.js"
 	},
 	"repository": {
 		"type": "git",
@@ -24,6 +24,7 @@
 	"homepage": "https://github.com/malee31/discordbot#readme",
 	"dependencies": {
 		"discord.js": "^12.2.0",
-		"dotenv": "^8.2.0"
+		"dotenv": "^8.2.0",
+		"mysql": "^2.18.1"
 	}
 }
