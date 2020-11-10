@@ -1,5 +1,6 @@
 # Testing Files and Credentials
 testing/
+devcommands/test.js
 .env
 
 # Node Files
