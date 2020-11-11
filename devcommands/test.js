@@ -1,4 +1,3 @@
-const prefix = require("../commands/prefix");
 const connection = require("../parts/mysqlConnection");
 
 module.exports = {
