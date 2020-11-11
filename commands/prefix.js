@@ -10,7 +10,7 @@ module.exports = {
 	async execute(message, args) {
 		console.log(`Setting prefix to [${args[0]}]`)
 
-		let sol = await connection.pQuery('INSERT INTO `prefix` VALUES(?, ?) ON DUPLICATE KEY UPDATE `Prefix` = VALUES(?)', [message.guild.id, args[0], args[0]])
+		await connection.pQuery('INSERT INTO `prefix` VALUES(?, ?) ON DUPLICATE KEY UPDATE `Prefix` = ?', [message.guild.id, args[0], args[0]])
 		.then(results => {
 			console.log(results);
 			return results;
