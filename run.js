@@ -2,9 +2,9 @@ require('dotenv').config();
 const fs = require("fs");
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const config = require("./parts/config.json");
 const timeFormat = require('./parts/timeFormat.js');
 const cmdParse = require("./parts/commandParse.js");
+const connection = require("./database/mysqlConnection");
 
 client.commands = new Discord.Collection();
 client.devcommands = new Discord.Collection();
@@ -36,9 +36,12 @@ client.on('ready', () => {
 
 client.on('message', async message => {
 	if(!message.content || !message.guild || (process.env.testingserver && message.guild.name !== process.env.testingserver)) return;
-	if(message.author.bot || !message.content.startsWith(process.env.testprefix || config.prefix)) return;
+	if(message.author.bot) return;
 
-	let subcommands = message.content.slice(config.prefix.length).trim().split(/\|/g);
+	let prefix = process.env.testPrefix || (await connection.getPrefix(message.guild.id)).toString();
+	if(!message.content.startsWith(prefix)) return;
+
+	let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 	for(let runningCommand = 0; runningCommand < subcommands.length; runningCommand++) {
 		let subcommand = subcommands[runningCommand];
 
@@ -59,7 +62,7 @@ client.on('message', async message => {
 			let reply = `You didn't provide any arguments, ${message.author}!`;
 
 			if(command.usage) {
-				reply += `\nThe proper usage would be: \`${config.prefix}${command.name} ${command.usage}\``;
+				reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 			}
 
 			return message.channel.send(reply);

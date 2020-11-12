@@ -1,4 +1,4 @@
-const connection = require("../parts/mysqlConnection");
+const connection = require("../database/mysqlConnection");
 
 module.exports = {
 	name: "prefix",
@@ -8,14 +8,8 @@ module.exports = {
 		return args[0];
 	},
 	async execute(message, args) {
-		console.log(`Setting prefix to [${args[0]}]`)
-
-		await connection.pQuery('INSERT INTO `prefix` VALUES(?, ?) ON DUPLICATE KEY UPDATE `Prefix` = ?', [message.guild.id, args[0], args[0]])
-		.then(results => {
-			console.log(results);
-			return results;
-		});
-
+		// console.log(`Setting prefix to [${args[0]}]`)
+		await connection.setPrefix(message.guild.id, args[0]);
 		return message.channel.send(`Prefix set to ${args[0]}`);
 	}
 };
