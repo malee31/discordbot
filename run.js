@@ -64,8 +64,8 @@ client.on('message', async message => {
 			return message.channel.send('I can\'t execute that command inside DMs!');
 		}
 
-		if(command.args && !args.length) {
-			let reply = `You didn't provide any arguments, ${message.author}!`;
+		if(command.args && command.args <= args.length) {
+			let reply = `You didn't provide enough arguments, ${message.author.toString()}!`;
 
 			if(command.usage) {
 				reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
@@ -74,33 +74,39 @@ client.on('message', async message => {
 			return message.channel.send(reply);
 		}
 
+		//Validation for supplied argument types and values if a function exists for it
+		if(typeof command.validate === "function" && !command.validate(message, args)) return;
+
+		//Cooldown checks
 		const now = Date.now();
-		if(!cooldowns.get(command.name)) {
-			cooldowns.set(command.name, new Discord.Collection());
-		}
-		const timestamps = cooldowns.get(command.name);
-		const cooldownAmount = command.cooldown * 1000 || 0;
-
-		if(timestamps.has(message.author.id)) {
-			const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-			if(now < expirationTime) {
-				let timeLeft = timeFormat((expirationTime - now) / 1000);
-
-				if(typeof command.cooldownMessage == "function") return command.cooldownMessage(message, timeLeft);
-				return message.reply(`Please wait ${timeLeft} before reusing the \`${command.name}\` command.`);
+		if(typeof command.cooldown === "number" && command.cooldown > 0) {
+			if(!cooldowns.get(command.name)) {
+				cooldowns.set(command.name, new Discord.Collection());
 			}
+
+			const timestamps = cooldowns.get(command.name);
+			const cooldownAmount = command.cooldown * 1000;
+
+			if(timestamps.has(message.author.id)) {
+				const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+				if(now < expirationTime) {
+					let timeLeft = timeFormat((expirationTime - now) / 1000);
+
+					if(typeof command.cooldownMessage == "function") {
+						return command.cooldownMessage(message, timeLeft);
+					}
+					return message.reply(`Please wait ${timeLeft} before reusing the \`${command.name}\` command.`);
+				}
+			}
+
+			//Set timeouts if cooldown doesn't exist or has expired
+			timestamps.set(message.author.id, now);
+			//TODO: See if there is a way to remove this timeout
+			setTimeout(() => timestamps.delete(message.author.id), command.cooldown * 1000);
 		}
 
 		try {
-			if(typeof command.validate === "function" && !command.validate(message, args)) return;
-
-			if(cooldownAmount > 0) {
-				timestamps.set(message.author.id, now);
-				//TODO: See if there is a way to remove this timeout
-				setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-			}
-
 			command.execute(message, args);
 		} catch(error) {
 			console.error(error);
