@@ -13,7 +13,7 @@ module.exports = {
 		message.guild.members.cache.forEach(member => {
 			member = member.user;
 			if(member.bot) return;
-			sentTo.push(member.username + "#" + member.discriminator);
+			sentTo.push(member.tag);
 			return member.send("Server Broadcast: " + args.join(" "));
 		});
 		console.log(`Sent ${args.join(" ")} to entire ${message.guild.name} server:\n${sentTo.join("\n")}`);

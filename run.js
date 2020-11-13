@@ -30,7 +30,7 @@ client.on('ready', () => {
 		console.log("Successfully Set Activity");
 	}).catch(err => {
 		console.log("Failed to set own activity");
-		console.log(err);
+		console.error(err);
 	});
 });
 
@@ -39,7 +39,13 @@ client.on('message', async message => {
 	if(message.author.bot) return;
 
 	let prefix = process.env.testPrefix || (await connection.getPrefix(message.guild.id)).toString();
-	if(!message.content.startsWith(prefix)) return;
+	if(!message.content.startsWith(prefix)) {
+		prefix = `<@!${client.user.id}>`;
+		if(!message.content.startsWith(prefix)) {
+			prefix = `<@${client.user.id}>`;
+			if(!message.content.startsWith(prefix)) return;
+		}
+	}
 
 	let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 	for(let runningCommand = 0; runningCommand < subcommands.length; runningCommand++) {

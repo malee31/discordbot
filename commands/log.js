@@ -11,7 +11,7 @@ module.exports = {
 		let logEmbed = new Discord.MessageEmbed()
 		.setColor('#808080');
 
-		logEmbed.setAuthor(`${message.author.username}#${message.author.discriminator}`, message.author.displayAvatarURL({dynamic: true}))
+		logEmbed.setAuthor(`${message.author.tag}`, message.author.displayAvatarURL({dynamic: true}))
 		logEmbed.setDescription(args.join(" "));
 		logEmbed.setTimestamp(message.createdAt);
 
