@@ -25,11 +25,18 @@ const cooldowns = new Discord.Collection();
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	client.user.setActivity("You While Being Updated", {type: "LISTENING"})
+	client.user.setPresence({
+		activity: {
+			type: "LISTENING",
+			name: "You While Being Updated"
+		},
+		status: "online",
+		afk: false
+	})
 	.then(() => {
-		console.log("Successfully Set Activity");
+		console.log("Successfully Set Presence");
 	}).catch(err => {
-		console.log("Failed to set own activity");
+		console.log("Failed to Set Presence");
 		console.error(err);
 	});
 });
@@ -100,7 +107,7 @@ client.on('message', async message => {
 				}
 			}
 
-			//Set timeouts if cooldown doesn't exist or has expired
+			//Set timeouts if cooldown has expired
 			timestamps.set(message.author.id, now);
 			//TODO: See if there is a way to remove this timeout
 			setTimeout(() => timestamps.delete(message.author.id), command.cooldown * 1000);
