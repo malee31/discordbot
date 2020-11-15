@@ -1,6 +1,7 @@
 {
 	"prefix": ">",
+	"mysql": true,
 	"substitutionPlaceholder": "substitutionplaceholder",
-	"minSpam": 0,
+	"minSpam": 1,
 	"maxSpam": 10
 }

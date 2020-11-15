@@ -1,45 +1,29 @@
 require('dotenv').config();
 const fs = require("fs");
+const path = require("path");
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const timeFormat = require('./parts/timeFormat.js');
 const cmdParse = require("./parts/commandParse.js");
 const connection = require("./database/mysqlConnection");
+const cooldownManager = require("./parts/cooldownManager");
 
 client.commands = new Discord.Collection();
 client.devcommands = new Discord.Collection();
-const commandFiles = fs.readdirSync(`${__dirname}/commands`).filter(file => file.endsWith('.js'));
-const devcommandFiles = fs.readdirSync(`${__dirname}/devcommands`).filter(file => file.endsWith('.js'));
+loadCommands(client.commands, "./commands");
+loadCommands(client.devcommands, "./devcommands");
 
-for(const file of commandFiles) {
-	const command = require(`${__dirname}/commands/${file}`);
-	client.commands.set(command.name, command);
+function loadCommands(commandCollection, relativePath) {
+	const commandFiles = fs.readdirSync(path.resolve(__dirname, relativePath)).filter(file => file.endsWith('.js'));
+	for(const fileName of commandFiles) {
+		const loadedCommand = require(path.resolve(__dirname, relativePath, fileName));
+		commandCollection.set(loadedCommand.name, loadedCommand);
+
+		//Create cooldown list if needed
+		if(typeof loadedCommand.cooldown === "number" && loadedCommand.cooldown > 0) {
+			cooldownManager.createCooldown(loadedCommand.name);
+		}
+	}
 }
-
-for(const file of devcommandFiles) {
-	const devcommand = require(`${__dirname}/devcommands/${file}`);
-	client.devcommands.set(devcommand.name, devcommand);
-}
-
-const cooldowns = new Discord.Collection();
-
-client.on('ready', () => {
-	console.log(`Logged in as ${client.user.tag}!`);
-	client.user.setPresence({
-		activity: {
-			type: "LISTENING",
-			name: "You While Being Updated"
-		},
-		status: "online",
-		afk: false
-	})
-	.then(() => {
-		console.log("Successfully Set Presence");
-	}).catch(err => {
-		console.log("Failed to Set Presence");
-		console.error(err);
-	});
-});
 
 client.on('message', async message => {
 	if(!message.content || !message.guild || (process.env.testingserver && message.guild.name !== process.env.testingserver)) return;
@@ -85,33 +69,7 @@ client.on('message', async message => {
 		if(typeof command.validate === "function" && !command.validate(message, args)) return;
 
 		//Cooldown checks
-		const now = Date.now();
-		if(typeof command.cooldown === "number" && command.cooldown > 0) {
-			if(!cooldowns.get(command.name)) {
-				cooldowns.set(command.name, new Discord.Collection());
-			}
-
-			const timestamps = cooldowns.get(command.name);
-			const cooldownAmount = command.cooldown * 1000;
-
-			if(timestamps.has(message.author.id)) {
-				const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-				if(now < expirationTime) {
-					let timeLeft = timeFormat((expirationTime - now) / 1000);
-
-					if(typeof command.cooldownMessage == "function") {
-						return command.cooldownMessage(message, timeLeft);
-					}
-					return message.reply(`Please wait ${timeLeft} before reusing the \`${command.name}\` command.`);
-				}
-			}
-
-			//Set timeouts if cooldown has expired
-			timestamps.set(message.author.id, now);
-			//TODO: See if there is a way to remove this timeout
-			setTimeout(() => timestamps.delete(message.author.id), command.cooldown * 1000);
-		}
+		if(await cooldownManager.cooldownCheck(message, command) !== true) return;
 
 		try {
 			command.execute(message, args);
@@ -120,6 +78,24 @@ client.on('message', async message => {
 			await message.reply('there was an error trying to execute that command!');
 		}
 	}
+});
+
+client.on('ready', () => {
+	console.log(`Logged in as ${client.user.tag}!`);
+	client.user.setPresence({
+		activity: {
+			type: "LISTENING",
+			name: "You While Being Updated"
+		},
+		status: "online",
+		afk: false
+	})
+	.then(() => {
+		console.log("Successfully Set Presence");
+	}).catch(err => {
+		console.log("Failed to Set Presence");
+		console.error(err);
+	});
 });
 
 client.once("disconnect", () => {
