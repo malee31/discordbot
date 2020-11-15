@@ -1,11 +1,12 @@
 const mysql = require("mysql");
 const config = require("../parts/config.json");
+const prefixTable = config.mysql.tables.prefix;
 
 const connectionPool = mysql.createPool({
 	host: "127.0.0.1",
 	user: "root",
 	password: "",
-	database: "discordbot",
+	database: config.mysql.database,
 	connectionLimit: 10,
 	queueLimit: 20
 });
@@ -25,11 +26,13 @@ function pQuery(query, queryVars = []) {
 }
 
 async function setPrefix(guildID, newPrefix) {
-	return await pQuery('INSERT INTO `prefix` VALUES(?, ?) ON DUPLICATE KEY UPDATE `Prefix` = ?', [guildID, newPrefix, newPrefix]);
+	return await pQuery("INSERT INTO ?? VALUES(?, ?) ON DUPLICATE KEY UPDATE ?? = ?",
+		[prefixTable.table, guildID, newPrefix, prefixTable.columns.Prefix, newPrefix]);
 }
 
 async function getPrefix(guildID) {
-	let prefix = await pQuery("SELECT `Prefix` as prefix FROM `prefix` WHERE `GuildID` = ? LIMIT 1", [guildID]);
+	let prefix = await pQuery("SELECT ?? as prefix FROM `prefix` WHERE ?? = ? LIMIT 1",
+		[prefixTable.columns.Prefix, prefixTable.columns.GuildID, guildID]);
 	// console.log(prefix);
 	if(prefix && prefix.length === 1 && prefix[0].prefix) {
 		prefix = prefix[0].prefix;

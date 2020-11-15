@@ -1,6 +1,22 @@
 {
 	"prefix": ">",
-	"mysql": true,
+	"mysql": {
+		"enabled": true,
+		"database": "discordbot",
+		"tables": {
+			"prefix": {
+				"table": "prefix",
+				"columns": {
+					"GuildID": "GuildID",
+					"Prefix": "Prefix"
+				}
+			},
+			"cooldowns": {
+				"table": "cooldowns",
+				"UserID": "UserID"
+			}
+		}
+	},
 	"substitutionPlaceholder": "substitutionplaceholder",
 	"minSpam": 1,
 	"maxSpam": 10
