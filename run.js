@@ -7,12 +7,7 @@ const cmdParse = require("./parts/commandParse.js");
 const connection = require("./database/mysqlConnection");
 const cooldownManager = require("./parts/cooldownManager");
 
-client.commands = new Discord.Collection();
-client.devcommands = new Discord.Collection();
-loadCommands(client.commands, "./commands");
-loadCommands(client.devcommands, "./devcommands");
-
-function loadCommands(commandCollection, relativePath) {
+async function loadCommands(commandCollection, relativePath) {
 	const commandFiles = fs.readdirSync(path.resolve(__dirname, relativePath)).filter(file => file.endsWith('.js'));
 	for(const fileName of commandFiles) {
 		const loadedCommand = require(path.resolve(__dirname, relativePath, fileName));
@@ -20,10 +15,21 @@ function loadCommands(commandCollection, relativePath) {
 
 		//Create cooldown list if needed
 		if(typeof loadedCommand.cooldown === "number" && loadedCommand.cooldown > 0) {
-			cooldownManager.createCooldown(loadedCommand.name);
+			await cooldownManager.createCooldown(loadedCommand.name);
 		}
 	}
 }
+
+client.commands = new Discord.Collection();
+client.devcommands = new Discord.Collection();
+Promise.all([
+	loadCommands(client.commands, "./commands"),
+	loadCommands(client.devcommands, "./devcommands")
+]).catch(err => {
+	console.log("Failed to load commands. Exiting");
+	console.error(err);
+	process.exit(1);
+});
 
 client.on('message', async message => {
 	if(!message.content || !message.guild || (process.env.testingserver && message.guild.name !== process.env.testingserver)) return;

@@ -16,6 +16,22 @@
 /*!40111 SET @OLD_SQL_NOTES = @@SQL_NOTES, SQL_NOTES = 0 */;
 
 --
+-- Table structure for table `cooldowns`
+--
+
+DROP TABLE IF EXISTS `cooldowns`;
+/*!40101 SET @saved_cs_client = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cooldowns`
+(
+    `UserID` varchar(20) NOT NULL,
+    `spam`   int(11) unsigned DEFAULT NULL,
+    PRIMARY KEY (`UserID`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `prefix`
 --
 
@@ -40,4 +56,4 @@ CREATE TABLE `prefix`
 /*!40101 SET COLLATION_CONNECTION = @OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES = @OLD_SQL_NOTES */;
 
--- Dump completed on 2020-11-10 19:18:28
+-- Dump completed on 2020-11-14 21:23:08
