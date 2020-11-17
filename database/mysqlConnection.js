@@ -31,15 +31,21 @@ async function setPrefix(guildID, newPrefix) {
 }
 
 async function getPrefix(guildID) {
-	let prefix = await pQuery("SELECT ?? as prefix FROM `prefix` WHERE ?? = ? LIMIT 1",
-		[prefixTable.columns.Prefix, prefixTable.columns.GuildID, guildID]);
-	// console.log(prefix);
-	if(prefix && prefix.length === 1 && prefix[0].prefix) {
-		prefix = prefix[0].prefix;
-	} else {
-		prefix = config.prefix;
+	let prefix = config.prefix;
+	try {
+		let queried = await pQuery("SELECT ?? as prefix FROM `prefix` WHERE ?? = ? LIMIT 1",
+			[prefixTable.columns.Prefix, prefixTable.columns.GuildID, guildID]);
+		if(queried && queried.length === 1 && queried[0].prefix) {
+			prefix = queried[0].prefix;
+		}
+		//console.log(prefix);
+		return prefix;
+	} catch(err) {
+		console.warn("MySQL may be disabled. Returning default prefix instead of custom guild prefixes");
+		console.warn(err);
+		//console.log(prefix);
+		return prefix
 	}
-	return prefix;
 }
 
 module.exports = {

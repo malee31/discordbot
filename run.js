@@ -6,6 +6,7 @@ const client = new Discord.Client();
 const cmdParse = require("./parts/commandParse.js");
 const connection = require("./database/mysqlConnection");
 const cooldownManager = require("./parts/cooldownManager");
+let mentionPrefixPattern;
 
 async function loadCommands(commandCollection, relativePath) {
 	const commandFiles = fs.readdirSync(path.resolve(__dirname, relativePath)).filter(file => file.endsWith('.js'));
@@ -13,42 +14,38 @@ async function loadCommands(commandCollection, relativePath) {
 		const loadedCommand = require(path.resolve(__dirname, relativePath, fileName));
 		commandCollection.set(loadedCommand.name, loadedCommand);
 
-		//Create cooldown list if needed
+		//Create cooldown table or collection if needed
 		if(typeof loadedCommand.cooldown === "number" && loadedCommand.cooldown > 0) {
 			await cooldownManager.createCooldown(loadedCommand.name);
 		}
 	}
 }
 
+//Commands and ADMIN ONLY commands are loaded into these two collections respectively
 client.commands = new Discord.Collection();
 client.devcommands = new Discord.Collection();
 Promise.all([
 	loadCommands(client.commands, "./commands"),
 	loadCommands(client.devcommands, "./devcommands")
 ]).catch(err => {
-	console.log("Failed to load commands. Exiting");
+	console.log("Failed to load commands. Shutting down");
 	console.error(err);
 	process.exit(1);
 });
 
 client.on('message', async message => {
-	if(!message.content || !message.guild || (process.env.testingserver && message.guild.name !== process.env.testingserver)) return;
-	if(message.author.bot) return;
+	if(!message.content || message.author.bot || message.webhookID || message.system) return;
+	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
 
-	let prefix = process.env.testPrefix || (await connection.getPrefix(message.guild.id)).toString();
-	if(!message.content.startsWith(prefix)) {
-		prefix = `<@!${client.user.id}>`;
-		if(!message.content.startsWith(prefix)) {
-			prefix = `<@${client.user.id}>`;
-			if(!message.content.startsWith(prefix)) return;
-		}
-	}
+	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
+	let prefix = process.env.testPrefix || await connection.getPrefix(message.guild.id);
+	if(mentionPrefixPattern.test(message.content)) prefix = message.content.match(mentionPrefixPattern)[0];
 
 	let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 	for(let runningCommand = 0; runningCommand < subcommands.length; runningCommand++) {
 		let subcommand = subcommands[runningCommand];
 
-		let {command, args} = cmdParse(subcommand);
+		let {command, args} = cmdParse(subcommand, prefix);
 		let devcommandTest = command;
 		command = client.commands.get(command) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command));
 		if(!command) {
@@ -88,6 +85,7 @@ client.on('message', async message => {
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
+	mentionPrefixPattern = new RegExp(`<@!?${client.user.id}>`);
 	client.user.setPresence({
 		activity: {
 			type: "LISTENING",
