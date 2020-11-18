@@ -49,8 +49,8 @@ function parseArguments(joinedArgs) {
 	let strings = joinedArgs.match(/'([^']+)'/g);
 	joinedArgs = joinedArgs.replace(config.placeholderText, "");
 	joinedArgs = joinedArgs.replace(/'([^']+)'/g, config.placeholderText);
-	// Remove single quotes from around each argument and trim if config.obsessiveTrimming is enabled
-	for(let extractedNum = 0; extractedNum < strings.length; extractedNum++) {
+	// Remove single quotes from around each argument
+	for(let extractedNum = 0; strings && extractedNum < strings.length; extractedNum++) {
 		strings[extractedNum] = strings[extractedNum].substring(1, strings[extractedNum].length - 1);
 		strings[extractedNum] = config.obsessiveTrimming ? strings[extractedNum].trim() : strings[extractedNum];
 	}

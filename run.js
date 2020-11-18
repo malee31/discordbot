@@ -5,7 +5,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const cmdParse = require("./parts/commandParse.js");
 const connection = require("./database/mysqlConnection");
-const cooldownManager = require("./parts/cooldownManager");
+const cooldownManager = require("./database/cooldownManager");
 let mentionPrefixPattern;
 
 async function loadCommands(commandCollection, relativePath) {
