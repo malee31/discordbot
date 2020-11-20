@@ -4,9 +4,7 @@ module.exports = {
 	name: "embed",
 	description: "Resends your message as an embed",
 	usage: "'[Title]' '[Description]'",
-	validate(message, args) {
-		return Boolean(args[1]);
-	},
+	args: 2,
 	execute(message, args) {
 		let textEmbed = new Discord.MessageEmbed()
 		.setColor('#808080');

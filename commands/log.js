@@ -4,9 +4,7 @@ module.exports = {
 	name: "log",
 	description: "Converts your message into an embed and deletes your original message if possible",
 	usage: "[Content]",
-	validate(message, args) {
-		return args.length > 0;
-	},
+	args: 1,
 	execute(message, args) {
 		let logEmbed = new Discord.MessageEmbed()
 		.setColor('#808080');
