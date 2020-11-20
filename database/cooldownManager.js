@@ -8,19 +8,20 @@ let cooldownCommands;
 const cooldowns = new Discord.Collection();
 
 module.exports = {
+	createTable,
 	createCooldown,
 	cooldownCheck
 };
 
-connection.pQuery("CREATE TABLE IF NOT EXISTS ?? (?? VARCHAR(20) PRIMARY KEY)",
-	[cooldownsTable.table, cooldownsTable.UserID])
-.then(() => {
-	console.log("Cooldowns Table (Now) Exists");
-}).catch(err => {
-	console.warn("Could not create cooldowns table with MySQL");
-	connection.disable();
-	console.warn(err);
-});
+async function createTable() {
+	if(!connection.getEnabled()) return true;
+	try {
+		await connection.pQuery("CREATE TABLE IF NOT EXISTS ?? (?? VARCHAR(20) PRIMARY KEY)",
+			[cooldownsTable.table, cooldownsTable.UserID]);
+	} catch(err) {
+		connection.disable("Could not create cooldowns table with MySQL", err);
+	}
+}
 
 async function cooldownCheck(message, command) {
 	if(typeof command.cooldown !== "number" || command.cooldown <= 0) return true;

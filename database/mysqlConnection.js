@@ -14,6 +14,7 @@ const connectionPool = mysql.createPool({
 
 // Turns querying into a Promise
 function pQuery(query, queryVars = []) {
+	// if(!enabled) throw "MySQL is disabled!";
 	if(!Array.isArray(queryVars)) queryVars = [queryVars];
 
 	return new Promise((resolve, reject) => {
@@ -27,8 +28,15 @@ function pQuery(query, queryVars = []) {
 }
 
 async function setPrefix(guildID, newPrefix) {
-	return await pQuery("INSERT INTO ?? VALUES(?, ?) ON DUPLICATE KEY UPDATE ?? = ?",
-		[prefixTable.table, guildID, newPrefix, prefixTable.columns.Prefix, newPrefix]);
+	if(!enabled) return false;
+	try {
+		await pQuery("INSERT INTO ?? VALUES(?, ?) ON DUPLICATE KEY UPDATE ?? = ?",
+			[prefixTable.table, guildID, newPrefix, prefixTable.columns.Prefix, newPrefix]);
+	} catch(err) {
+		console.err(`Failed to setPrefix: guildID - ${guildID} newPrefix - ${newPrefix}\n${err}`)
+		return false;
+	}
+	return true;
 }
 
 async function getPrefix(guildID) {
@@ -55,8 +63,9 @@ async function getPrefix(guildID) {
 	}
 }
 
-function disable() {
-	console.warn("MySQL was enabled in config but didn't respond on start up. Check if MySQL is running and that the credentials provided are correct.\nReboot after fixing problems to use MySQL and discard currently running cooldowns.\nDefaulting to running without MySQL by using Collections for cooldowns instead.");
+function disable(errorMessage = "", err) {
+	console.warn(`MySQL was enabled in config but didn't respond on start up. Check if MySQL is running and that the credentials provided are correct.\nReboot after fixing problems to use MySQL and discard currently running cooldowns.\nDefaulting to running without MySQL by using Collections for cooldowns instead.\n${errorMessage}`);
+	if(err) console.warn(err);
 	enabled = false;
 }
 
