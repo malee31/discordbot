@@ -2,6 +2,7 @@ module.exports = {
 	name: "dm",
 	aliases: ["info"],
 	description: "Get your own information from Discord",
+	usage: '[Message (optional)]',
 	execute(message, args) {
 		let promises = [];
 		promises.push(message.reply("Of course, on it"));

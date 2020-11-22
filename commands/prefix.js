@@ -3,7 +3,7 @@ const connection = require("../database/mysqlConnection");
 module.exports = {
 	name: "prefix",
 	description: "Set a new prefix for the bot to respond to. Bot will still respond to its own mention. Prefix cannot contain spaces",
-	usage: "[new prefix]",
+	usage: "[New Prefix]",
 	async execute(message, args) {
 		// console.log(`Setting prefix to [${args[0]}]`)
 		let reply;

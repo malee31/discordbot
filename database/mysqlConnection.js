@@ -19,7 +19,7 @@ function pQuery(query, queryVars = []) {
 
 	return new Promise((resolve, reject) => {
 		connectionPool.query(query, queryVars, function(err, rows, fields) {
-			if (err) {
+			if(err) {
 				return reject(err);
 			}
 			resolve(rows, fields);

@@ -1,6 +1,8 @@
 module.exports = {
 	name: 'targetdm',
 	description: 'Makes the bot DM one specific user',
+	usage: '[@User or User#1234] [Message]',
+	args: 2,
 	execute(message, args) {
 		let searchedUser = args[0];
 

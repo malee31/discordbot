@@ -4,6 +4,8 @@ module.exports = {
 	name: 'spam',
 	description: 'Spams a message repeatedly',
 	cooldown: 5,
+	usage: `[Number (default: ${config.minSpam})] [Message]`,
+	args: 1,
 	validate(message, args) {
 		let repeatNum = Number.parseInt(args[0]);
 		if(isNaN(repeatNum)) args.unshift(config.minSpam);

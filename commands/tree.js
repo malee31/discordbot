@@ -1,7 +1,7 @@
 module.exports = {
 	name: "tree",
 	description: "Sends the channel structure of the server",
-	usage: "[bare (optional)]",
+	usage: "[Bare (optional)]",
 	cooldown: 10,
 	execute(message, args) {
 		let bare = args[0] && args[0].toLowerCase() === "bare";

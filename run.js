@@ -38,7 +38,7 @@ async function startUp() {
 			loadCommands(client.commands, "./commands"),
 			loadCommands(client.devcommands, "./devcommands")
 		]);
-	} catch (err) {
+	} catch(err) {
 		console.warn("Failed to load commands. Shutting down");
 		console.error(err);
 		process.exit(1);
@@ -111,6 +111,7 @@ client.on('message', async message => {
 
 	// Runs the command and sends a message if something goes wrong.
 	try {
+		message.prefix = prefix;
 		await command.execute(message, args);
 	} catch(error) {
 		console.log("CAUGHT");
