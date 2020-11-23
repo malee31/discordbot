@@ -1,9 +1,9 @@
 require('dotenv').config();
-const fs = require("fs");
 const path = require("path");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const cmdParse = require("./parts/commandParse.js");
+const commandLoader = require("./parts/commandLoader");
 const connection = require("./database/mysqlConnection");
 const cooldownManager = require("./database/cooldownManager");
 let mentionPrefixPattern;
@@ -11,20 +11,6 @@ let mentionPrefixPattern;
 //Commands and ADMIN ONLY commands are loaded into these two collections respectively
 client.commands = new Discord.Collection();
 client.devcommands = new Discord.Collection();
-
-async function loadCommands(commandCollection, relativePath) {
-	const commandFiles = fs.readdirSync(path.resolve(__dirname, relativePath)).filter(file => file.endsWith('.js'));
-
-	for(const fileName of commandFiles) {
-		const loadedCommand = require(path.resolve(__dirname, relativePath, fileName));
-		commandCollection.set(loadedCommand.name, loadedCommand);
-
-		//Create cooldown table or collection if needed
-		if(typeof loadedCommand.cooldown === "number" && loadedCommand.cooldown > 0) {
-			await cooldownManager.createCooldown(loadedCommand.name);
-		}
-	}
-}
 
 async function startUp() {
 	console.log("Bot Starting Up");
@@ -34,10 +20,12 @@ async function startUp() {
 
 	console.log("Loading Bot Commands");
 	try {
-		await Promise.all([
-			loadCommands(client.commands, "./commands"),
-			loadCommands(client.devcommands, "./devcommands")
-		]);
+		// TODO: Test to make sure this works as intended and loads every command recursively and asynchronously
+		let commandPromises = [];
+		commandLoader(client.commands, path.resolve(__dirname, "./commands"), commandPromises);
+		commandLoader(client.devcommands, path.resolve(__dirname, "./devcommands"), commandPromises);
+		await Promise.all(commandPromises);
+		console.log("Loading commands finished");
 	} catch(err) {
 		console.warn("Failed to load commands. Shutting down");
 		console.error(err);
@@ -82,7 +70,7 @@ client.on('message', async message => {
 	}
 
 	// If a minimum number of arguments is listed on command.args, this will abort command execution if not enough are provided
-	if(typeof command.args === "number" && command.args >= args.length) {
+	if(typeof command.args === "number" && command.args > args.length) {
 		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? "" : "s"} are required.`;
 
 		// Adds the proper usage of the command is it is provided in command.usage
