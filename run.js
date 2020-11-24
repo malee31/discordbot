@@ -69,6 +69,20 @@ client.on('message', async message => {
 		return message.channel.send('I can\'t execute that command inside DMs!');
 	}
 
+	// Checks if the user has permission to use the command. Overridden by permission ADMINISTRATOR
+	// https://discord.js.org/#/docs/main/stable/class/Permissions?scrollTo=s-FLAGS
+	if(command.userPerms && !message.member.hasPermission("ADMINISTRATOR")) {
+		for(const perm of command.userPerms) {
+			if(!message.member.hasPermission(perm)) {
+				return message.channel.send(`Command requires you to have ${perm} permissions`);
+			}
+		}
+	}
+
+	// TODO: Check permissions for BOT and Channel Overrides:
+	// https://discordjs.guide/popular-topics/permissions.html#syncing-with-a-category
+	// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
+
 	// If a minimum number of arguments is listed on command.args, this will abort command execution if not enough are provided
 	if(typeof command.args === "number" && command.args > args.length) {
 		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? "" : "s"} are required.`;
