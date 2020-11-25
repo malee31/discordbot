@@ -4,6 +4,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const cmdParse = require("./parts/commandParse.js");
 const commandLoader = require("./parts/commandLoader");
+const commandSearcher = require("./parts/commandSearcher");
 const connection = require("./database/mysqlConnection");
 const cooldownManager = require("./database/cooldownManager");
 let mentionPrefixPattern;
@@ -52,19 +53,9 @@ client.on('message', async message => {
 	// let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 
 	let {command, args} = cmdParse(message.content.slice(prefix.length), prefix);
-	command = client.commands.get(command) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command)) || command;
-	// console.log(command);
-	if(typeof command === "string") {
-		// Check developer commands if the user has admin permissions or is the owner of the bot
-		if(!message.member.hasPermission("ADMINISTRATOR") && message.author.id !== process.env.owner) return;
-		command = client.devcommands.get(command) || client.devcommands.find(cmd => cmd.aliases && cmd.aliases.includes(command));
-	}
+	command = commandSearcher(client, message, command);
+	if(command === false) return;
 
-	// Abort command execution if no command is found with that name or alias
-	// Also aborts if the command is a devcommand and the user doesn't have permissions to use them
-	if(!command || typeof command === "string") return;
-
-	// If command.guildOnly is true, the command will abort and send a message to the user that they can't use the command in DMs
 	if(command.guildOnly && message.channel.type === 'dm') {
 		return message.channel.send('I can\'t execute that command inside DMs!');
 	}
@@ -83,7 +74,6 @@ client.on('message', async message => {
 	// https://discordjs.guide/popular-topics/permissions.html#syncing-with-a-category
 	// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
 
-	// If a minimum number of arguments is listed on command.args, this will abort command execution if not enough are provided
 	if(typeof command.args === "number" && command.args > args.length) {
 		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? "" : "s"} are required.`;
 
@@ -111,7 +101,6 @@ client.on('message', async message => {
 	// Handles the cooldowns. Checks and sets cooldowns based on command.cooldown if it is set
 	if(await cooldownManager.cooldownCheck(message, command) !== true) return;
 
-	// Runs the command and sends a message if something goes wrong.
 	try {
 		message.prefix = prefix;
 		await command.execute(message, args);
