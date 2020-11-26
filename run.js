@@ -53,7 +53,7 @@ client.on('message', async message => {
 	// let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 
 	let {command, args} = cmdParse(message.content.slice(prefix.length), prefix);
-	command = commandSearcher(client, message, command);
+	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 
 	if(command.guildOnly && message.channel.type === 'dm') {

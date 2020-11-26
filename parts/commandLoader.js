@@ -1,6 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const Discord = require("discord.js");
 const cooldownManager = require("../database/cooldownManager");
+
+const pluginConfigName = "plugin.json";
+const commandTopName = "commandTop";
 
 module.exports = loadCommands;
 
@@ -9,6 +13,20 @@ module.exports = loadCommands;
 // TODO: Load subcommands by category and chained arguments
 function loadCommands(commandCollection, absolutePath, PromiseCollection) {
 	const commandFiles = fs.readdirSync(absolutePath);
+	if(commandFiles.includes(pluginConfigName)) {
+		const pluginConfig = require(path.resolve(absolutePath, pluginConfigName));
+		const pluginCollection = new Discord.Collection();
+		pluginCollection[pluginConfigName] = pluginConfig;
+
+		const pluginNames = pluginConfig.aliases || [];
+		pluginNames.push(pluginConfig[commandTopName]);
+		for(const name of pluginNames) {
+			commandCollection.set(name, pluginCollection);
+		}
+
+		commandCollection = pluginCollection;
+		console.log(`Loaded plugin with ${commandTopName} ${pluginConfig[commandTopName]} from ${absolutePath}`);
+	}
 
 	for(const fileName of commandFiles) {
 		let itemPath = path.resolve(absolutePath, fileName);
