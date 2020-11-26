@@ -1,5 +1,6 @@
 module.exports = {
 	name: 'shutdown',
+	aliases: ["sd", "poweroff", "power-off"],
 	description: 'Shutdown the bot for maintenance. Requires permission ADMINISTRATOR',
 	validate(message) {
 		console.log(`Shutdown requested by: ${message.author.username}#${message.author.discriminator}`);

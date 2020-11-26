@@ -4,7 +4,10 @@ const cooldownManager = require("../database/cooldownManager");
 
 module.exports = loadCommands;
 
-function loadCommands(commandCollection, absolutePath, PromiseCollection, doNotReturn = true) {
+// Loads all commands from a folder recursively as quickly as possible by taking advantage of the fact that arrays are
+// passed by reference rather than value so all Promises can be pushed into it for Promise.all([Promise Array])
+// TODO: Load subcommands by category and chained arguments
+function loadCommands(commandCollection, absolutePath, PromiseCollection) {
 	const commandFiles = fs.readdirSync(absolutePath);
 
 	for(const fileName of commandFiles) {
@@ -26,7 +29,7 @@ function loadCommands(commandCollection, absolutePath, PromiseCollection, doNotR
 				if(stat.isDirectory()) {
 					console.log("SEARCHING SUBDIRECTORY: " + itemPath);
 					try {
-						loadCommands(commandCollection, itemPath, PromiseCollection, false);
+						loadCommands(commandCollection, itemPath, PromiseCollection);
 					} catch(err) {
 						console.warn(`Something went wrong loading commands from directory ${itemPath}`);
 						console.error(err);
@@ -42,6 +45,4 @@ function loadCommands(commandCollection, absolutePath, PromiseCollection, doNotR
 			if(Array.isArray(PromiseCollection)) PromiseCollection.push(recurse);
 		}
 	}
-
-	if(!doNotReturn) return Promise.all(PromiseCollection);
 }
