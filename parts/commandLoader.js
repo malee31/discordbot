@@ -12,7 +12,17 @@ module.exports = loadCommands;
 // passed by reference rather than value so all Promises can be pushed into it for Promise.all([Promise Array])
 // TODO: Load subcommands by category and chained arguments
 function loadCommands(commandCollection, absolutePath, PromiseCollection) {
-	const commandFiles = fs.readdirSync(absolutePath);
+	let commandFiles;
+	try {
+		commandFiles = fs.readdirSync(absolutePath);
+	} catch(err) {
+		if(err.code === "ENOENT") {
+			console.warn(`Folder at path does not exist: ${absolutePath}`);
+			return;
+		} else {
+			console.error(err);
+		}
+	}
 	if(commandFiles.includes(pluginConfigName)) {
 		const pluginConfig = require(path.resolve(absolutePath, pluginConfigName));
 		const pluginCollection = new Discord.Collection();

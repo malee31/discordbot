@@ -1,0 +1,5 @@
+{
+	"commandTop": "plugin",
+	"aliases": ["plug", "plug-in"],
+	"description": "General plugin tests"
+}

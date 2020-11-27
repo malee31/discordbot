@@ -24,6 +24,7 @@ async function startUp() {
 		// TODO: Test to make sure this works as intended and loads every command recursively and asynchronously
 		let commandPromises = [];
 		commandLoader(client.commands, path.resolve(__dirname, "./commands"), commandPromises);
+		commandLoader(client.commands, path.resolve(__dirname, "./plugins"), commandPromises);
 		commandLoader(client.devcommands, path.resolve(__dirname, "./devcommands"), commandPromises);
 		await Promise.all(commandPromises);
 		console.log("Loading commands finished");
