@@ -2,7 +2,6 @@ const Discord = require("discord.js");
 const timeFormat = require('../parts/timeFormat');
 
 const commandDetails = [];
-let pageLimit = 0;
 module.exports = {
 	name: 'help',
 	description: 'List all of my commands or info about a specific command.',
@@ -14,40 +13,38 @@ module.exports = {
 		.setFooter(`You can send "${message.prefix}help [command name]" to get info on a specific command!`)
 		.setColor("#808080");
 
-		cacheInfo(message.client.commands);
+		cacheInfo(commandDetails, message.client.commands);
 
 		if(args.length === 0) args.push(1);
 
 		if(!isNaN(Number.parseInt(args[0]))) {
-			args[0] = Number.parseInt(args[0]);
-		}
-
-		if(typeof args[0] === "number") {
-			paginate(helpEmbed, args[0]);
+			paginate(helpEmbed, commandDetails, args[0]);
 		} else {
-			singular(helpEmbed, message.prefix, args);
+			singular(helpEmbed, commandDetails, message.prefix, args);
 		}
 
 		return message.channel.send(helpEmbed);
 	},
 };
 
-function cacheInfo(commands) {
-	if(commandDetails.length === 0) {
+function cacheInfo(targetArray, commands) {
+	if(commandDetails.length === 0 || commandDetails !== targetArray) {
 		commands.forEach((command, index) => {
 			if(command instanceof Discord.Collection) {
 				const pluginConfig = command["plugin.json"];
 				if(index !== pluginConfig["commandTop"]) return;
-				commandDetails.push({
+				const subArray = [];
+				targetArray.push({
 					type: "plugin",
 					name: pluginConfig["commandTop"],
 					aliases: pluginConfig.aliases,
 					description: pluginConfig.description,
 					commands: Array.from(command.keys()),
-					collection: command
+					subcommands: subArray
 				});
+				cacheInfo(subArray, command);
 			} else {
-				commandDetails.push({
+				targetArray.push({
 					type: "command",
 					name: command.name,
 					aliases: command.aliases,
@@ -57,27 +54,26 @@ function cacheInfo(commands) {
 				});
 			}
 		});
-
-		pageLimit = Math.ceil(commandDetails.length / 10);
 	}
 }
 
-function paginate(embed, pageNum) {
-	pageNum = Math.max(1, pageNum);
-	if(pageNum > pageLimit) {
+function paginate(embed, commandArray, pageNum) {
+	pageNum = Math.max(1, Number.parseInt(pageNum));
+	if(isNaN(pageNum)) pageNum = 1;
+	if(pageNum > Math.ceil(commandArray.length / 10)) {
 		embed
-		.setTitle(`There are only ${pageLimit} help pages!`)
+		.setTitle(`There are only ${Math.ceil(commandArray.length / 10)} help pages!`)
 		.setDescription("Type a valid number of pages for help");
 	} else {
 		embed
-		.setFooter(`${embed.footer.text}   •   Page ${pageNum} of ${pageLimit}`);
+		.setFooter(`${embed.footer.text}   •   Page ${pageNum} of ${Math.ceil(commandArray.length / 10)}`);
 
 		pageNum--;
 		for(let commandNum = 0; commandNum < 10; commandNum++) {
 			let index = pageNum * 10 + commandNum;
-			if(index >= commandDetails.length) break;
+			if(index >= commandArray.length) break;
 
-			let command = commandDetails[index];
+			let command = commandArray[index];
 			if(command.type === "plugin") {
 				embed.addField(`${command.name} *[Plugin]*`, `${command.description}\nSubcommands: ${command.commands.join(", ")}`);
 			} else {
@@ -87,24 +83,30 @@ function paginate(embed, pageNum) {
 	}
 }
 
-function singular(embed, prefix, args) {
-	let command = commandDetails;
-	for(let argNum = 0; argNum < args.length; argNum++) {
-		const name = args[argNum].toLowerCase();
-		command = command.find(c => c.name === name || (c.aliases && c.aliases.includes(name)));
-		if(!command) {
-			embed.setTitle(`${prefix} ${args.slice(0, argNum + 1).join(" ")} is not a valid command`);
-			break;
-			//} else if(command.type === "command") {
-		} else {
-			embed.setTitle(`*${prefix} ${command.name}* ${command.cooldown ? `  [Cooldown: ${timeFormat(command.cooldown)}]` : ""}`);
+// TODO: Allow paginate to get a page number from plugins
 
-			if(command.description) embed.setDescription(command.description);
-			if(command.aliases) embed.addField("Aliases", command.aliases.join(', '));
-			if(command.usage) embed.addField("Usage", `${prefix}${command.name} ${command.usage}`);
-			break;
-		} /*else if(argNum + 1 === args.length) {
-			paginate(embed, command);
-		}*/
+function singular(embed, searchArray, prefix, args, argNum = 0) {
+	const name = args[argNum].toLowerCase();
+	const command = searchArray.find(c => c.name === name || (c.aliases && c.aliases.includes(name)));
+	if(!command) {
+		embed.setTitle(`${prefix} ${args.slice(0, argNum + 1).join(" ").toLowerCase()} is not a valid command`);
+	} else if(command.type === "command") {
+		embed.setTitle(`*${prefix} ${args.slice(0, argNum + 1).join(" ").toLowerCase()}* ${command.cooldown ? `  [Cooldown: ${timeFormat(command.cooldown)}]` : ""}`);
+
+		if(command.description) embed.setDescription(command.description);
+		if(command.aliases) embed.addField("Aliases", command.aliases.join(', '));
+		if(command.usage) embed.addField("Usage", `${prefix}${command.name} ${command.usage}`);
+	} else if(argNum + 1 === args.length) {
+		embed.setTitle(`*${prefix} ${args.join(" ").toLowerCase()}*`);
+		let desc = command.description || "";
+		if(command.aliases) {
+			if(desc) desc += `\n`;
+			desc += `Aliases: ${command.aliases.join(', ')}`;
+		}
+		if(desc) embed.setDescription(desc);
+
+		paginate(embed, command.subcommands);
+	} else {
+		singular(embed, command.subcommands, prefix, args, argNum + 1);
 	}
 }
