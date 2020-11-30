@@ -83,8 +83,6 @@ function paginate(embed, commandArray, pageNum) {
 	}
 }
 
-// TODO: Allow paginate to get a page number from plugins
-
 function singular(embed, searchArray, prefix, args, argNum = 0) {
 	const name = args[argNum].toLowerCase();
 	const command = searchArray.find(c => c.name === name || (c.aliases && c.aliases.includes(name)));
@@ -96,7 +94,7 @@ function singular(embed, searchArray, prefix, args, argNum = 0) {
 		if(command.description) embed.setDescription(command.description);
 		if(command.aliases) embed.addField("Aliases", command.aliases.join(', '));
 		if(command.usage) embed.addField("Usage", `${prefix}${command.name} ${command.usage}`);
-	} else if(argNum + 1 === args.length) {
+	} else if(argNum + 1 === args.length || !isNaN(Number.parseInt(args[argNum + 1]))) {
 		embed.setTitle(`*${prefix} ${args.join(" ").toLowerCase()}*`);
 		let desc = command.description || "";
 		if(command.aliases) {
@@ -105,7 +103,7 @@ function singular(embed, searchArray, prefix, args, argNum = 0) {
 		}
 		if(desc) embed.setDescription(desc);
 
-		paginate(embed, command.subcommands);
+		paginate(embed, command.subcommands, Number.parseInt(args[argNum + 1]));
 	} else {
 		singular(embed, command.subcommands, prefix, args, argNum + 1);
 	}
