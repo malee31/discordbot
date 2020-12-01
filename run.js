@@ -74,6 +74,13 @@ client.on('message', async message => {
 	// TODO: Check permissions for BOT and Channel Overrides:
 	// https://discordjs.guide/popular-topics/permissions.html#syncing-with-a-category
 	// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
+	if(command.botPerms && !message.guild.me.hasPermission("ADMINISTRATOR")) {
+		for(const perm of command.botPerms) {
+			if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).hasPermission(perm))) {
+				return message.channel.send(`Command requires you to have ${perm} permissions`);
+			}
+		}
+	}
 
 	if(typeof command.args === "number" && command.args > args.length) {
 		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? "" : "s"} are required.`;
