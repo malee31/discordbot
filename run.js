@@ -12,6 +12,8 @@ let mentionPrefixPattern;
 //Commands and ADMIN ONLY commands are loaded into these two collections respectively
 client.commands = new Discord.Collection();
 client.devcommands = new Discord.Collection();
+//Make DB easily accessible by commands
+client.connection = connection;
 
 async function startUp() {
 	console.log("Bot Starting Up");
@@ -76,8 +78,9 @@ client.on('message', async message => {
 	// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
 	if(command.botPerms && !message.guild.me.hasPermission("ADMINISTRATOR")) {
 		for(const perm of command.botPerms) {
-			if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).hasPermission(perm))) {
-				return message.channel.send(`Command requires you to have ${perm} permissions`);
+			if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
+				// console.log(message.guild.me.permissionsIn(message.channel).toArray())
+				return message.channel.send(`I need ${perm} permissions to run that command!`);
 			}
 		}
 	}

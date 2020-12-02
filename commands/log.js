@@ -4,6 +4,7 @@ module.exports = {
 	name: "log",
 	description: "Converts your message into an embed and deletes your original message if possible",
 	usage: "[Message]",
+	botPerms: ["MANAGE_MESSAGES"],
 	args: 1,
 	execute(message, args) {
 		let logEmbed = new Discord.MessageEmbed()
