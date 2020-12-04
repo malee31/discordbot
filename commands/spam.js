@@ -6,6 +6,7 @@ module.exports = {
 	cooldown: 5,
 	usage: `[Number (default: ${config.minSpam})] [Message]`,
 	args: 1,
+	botPerms: ["SEND_MESSAGES"],
 	validate(message, args) {
 		let repeatNum = Number.parseInt(args[0]);
 		if(isNaN(repeatNum)) args.unshift(config.minSpam);

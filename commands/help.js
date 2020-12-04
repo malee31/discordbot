@@ -6,6 +6,7 @@ module.exports = {
 	name: 'help',
 	description: 'List all of my commands or info about a specific command.',
 	aliases: ['commands'],
+	botPerms: ["SEND_MESSAGES"],
 	usage: '[Command Name | Page Number]',
 	execute(message, args) {
 		let helpEmbed = new Discord.MessageEmbed()

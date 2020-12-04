@@ -3,6 +3,7 @@ module.exports = {
 	aliases: ["match"],
 	description: "Sends a list of members who's username and discriminator match the pattern",
 	usage: '[Regex Pattern]',
+	botPerms: ["SEND_MESSAGES"],
 	execute(message, args) {
 		let regex = new RegExp(args[0]);
 		//console.log("Regexp: ", regex);

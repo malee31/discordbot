@@ -4,6 +4,7 @@ module.exports = {
 	name: "embed",
 	description: "Resends your message as an embed",
 	usage: "'[Title]' '[Description]'",
+	botPerms: ["SEND_MESSAGES"],
 	args: 2,
 	execute(message, args) {
 		let textEmbed = new Discord.MessageEmbed()
