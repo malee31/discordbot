@@ -40,6 +40,12 @@ async function startUp() {
 	return client.login(process.env.discordtoken);
 }
 
+async function safeSend(message, content) {
+	if(message.guild.me.hasPermission("ADMINISTRATOR") || message.guild.me.hasPermission("SEND_MESSAGES") || message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES")) {
+		return message.channel.send(content);
+	}
+}
+
 client.on('message', async message => {
 	if(!message.content || message.author.bot || message.webhookID || message.system) return;
 	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
@@ -60,7 +66,7 @@ client.on('message', async message => {
 	if(command === false) return;
 
 	if(command.guildOnly && message.channel.type === 'dm') {
-		return message.channel.send('I can\'t execute that command inside DMs!');
+		return safeSend(message, 'I can\'t execute that command inside DMs!');
 	}
 
 	// Checks if the user has permission to use the command. Overridden by permission ADMINISTRATOR
@@ -68,7 +74,7 @@ client.on('message', async message => {
 	if(command.userPerms && !message.member.hasPermission("ADMINISTRATOR")) {
 		for(const perm of command.userPerms) {
 			if(!message.member.hasPermission(perm)) {
-				return message.channel.send(`Command requires you to have ${perm} permissions`);
+				return safeSend(message, `Command requires you to have ${perm} permissions`);
 			}
 		}
 	}
@@ -80,7 +86,7 @@ client.on('message', async message => {
 		for(const perm of command.botPerms) {
 			if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
 				// console.log(message.guild.me.permissionsIn(message.channel).toArray())
-				return message.channel.send(`I need ${perm} permissions to run that command!`);
+				return safeSend(message, `I need ${perm} permissions to run that command!`);
 			}
 		}
 	}
@@ -93,7 +99,7 @@ client.on('message', async message => {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 
-		return message.channel.send(reply);
+		return safeSend(message, reply);
 	}
 
 	// Validation for supplied argument types and values if a function exists for it
@@ -106,7 +112,7 @@ client.on('message', async message => {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 
-		return message.channel.send(reply);
+		return safeSend(message, reply);
 	}
 
 	// Handles the cooldowns. Checks and sets cooldowns based on command.cooldown if it is set
