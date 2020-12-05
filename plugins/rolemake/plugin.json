@@ -1,0 +1,5 @@
+{
+	"commandTop": "rolemake",
+	"aliases": ["makerole", "role"],
+	"description": "Role Management Plugin"
+}
