@@ -2,6 +2,7 @@ module.exports = {
 	name: "prefix",
 	description: "Set a new prefix for the bot to respond to. Bot will still respond to its own mention. Prefix cannot contain spaces",
 	usage: "[New Prefix]",
+	guildOnly: true,
 	userPerms: ["MANAGE_GUILD"],
 	botPerms: ["SEND_MESSAGES"],
 	async execute(message, args) {

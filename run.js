@@ -51,6 +51,7 @@ client.on('message', async message => {
 	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
 
 	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
+	// TODO: Fix bug where bot won't run in DMs because of message.guild being null in DMs
 	let prefix = process.env.testPrefix || await connection.getPrefix(message.guild.id);
 	if(!message.content.startsWith(prefix) && !process.env.testPrefix && mentionPrefixPattern.test(message.content)) {
 		prefix = message.content.match(mentionPrefixPattern)[0];

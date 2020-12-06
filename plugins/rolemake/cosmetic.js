@@ -6,17 +6,23 @@ module.exports = {
 	botPerms: ["MANAGE_ROLES"],
 	args: 1,
 	async execute(message, args) {
-		const newRole = await message.guild.roles.create({
-			data: {
-				name: args.join(" "),
-				color: /^#[0-9a-f]{6}$/.test(args[0].toLowerCase()) ? "#" + args.shift().toLowerCase().match(/(?<=^#)([a-f0-9]{6})/)[0] : "#99AAB5",
-				permissions: [],
-				hoist: true,
-				mentionable: true
-			},
-			reason: `Empty role created with [rolemake cosmetic] command by ${message.author.tag}`
-		});
+		let newRole;
+		try {
+			newRole = await message.guild.roles.create({
+				data: {
+					name: args.join(" "),
+					color: /^#[0-9a-f]{6}$/.test(args[0].toLowerCase()) ? "#" + args.shift().toLowerCase().match(/(?<=^#)([a-f0-9]{6})/)[0] : "#99AAB5",
+					permissions: [],
+					hoist: true,
+					mentionable: true
+				},
+				reason: `Empty role created with [rolemake cosmetic] command by ${message.author.tag}`
+
+			});
+		} catch (err) {
+			return message.channel.send(`Failed to create new cosmetic role`);
+		}
 
 		return message.channel.send(`Created cosmetic role ${newRole.toString()}`);
-	},
+	}
 };
