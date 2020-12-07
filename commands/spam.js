@@ -5,6 +5,7 @@ module.exports = {
 	description: 'Spams a message repeatedly',
 	cooldown: 5,
 	usage: `[Number (default: ${config.minSpam})] [Message]`,
+	allowDM: true,
 	args: 1,
 	botPerms: ["SEND_MESSAGES"],
 	validate(message, args) {

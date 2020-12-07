@@ -43,7 +43,7 @@ async function getPrefix(guildID) {
 	let prefix = config.prefix;
 
 	if(!enabled) {
-		console.warn("MySQL may be disabled. Returning default prefix instead of custom guild prefixes");
+		// console.warn("MySQL may be disabled. Returning default prefix instead of custom guild prefixes");
 		return prefix;
 	}
 

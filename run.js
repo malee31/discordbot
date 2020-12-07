@@ -41,7 +41,7 @@ async function startUp() {
 }
 
 async function safeSend(message, content) {
-	if(message.guild.me.hasPermission("ADMINISTRATOR") || message.guild.me.hasPermission("SEND_MESSAGES") || message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES")) {
+	if(message.channel.type === "dm" || message.guild.me.hasPermission("ADMINISTRATOR") || message.guild.me.hasPermission("SEND_MESSAGES") || message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES")) {
 		return message.channel.send(content);
 	}
 }
@@ -52,7 +52,7 @@ client.on('message', async message => {
 
 	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
 	// TODO: Fix bug where bot won't run in DMs because of message.guild being null in DMs
-	let prefix = process.env.testPrefix || await connection.getPrefix(message.guild.id);
+	let prefix = process.env.testPrefix || await connection.getPrefix((message.guild ? message.guild.id : -1));
 	if(!message.content.startsWith(prefix) && !process.env.testPrefix && mentionPrefixPattern.test(message.content)) {
 		prefix = message.content.match(mentionPrefixPattern)[0];
 	}
@@ -66,28 +66,30 @@ client.on('message', async message => {
 	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 
-	if(command.guildOnly && message.channel.type === 'dm') {
+	if(message.channel.type === 'dm' && !command.allowDM) {
 		return safeSend(message, 'I can\'t execute that command inside DMs!');
 	}
 
-	// Checks if the user has permission to use the command. Overridden by permission ADMINISTRATOR
-	// https://discord.js.org/#/docs/main/stable/class/Permissions?scrollTo=s-FLAGS
-	if(command.userPerms && !message.member.hasPermission("ADMINISTRATOR")) {
-		for(const perm of command.userPerms) {
-			if(!message.member.hasPermission(perm)) {
-				return safeSend(message, `Command requires you to have ${perm} permissions`);
+	if(message.guild) {
+		// Checks if the user has permission to use the command. Overridden by permission ADMINISTRATOR
+		// https://discord.js.org/#/docs/main/stable/class/Permissions?scrollTo=s-FLAGS
+		if(command.userPerms && !message.member.hasPermission("ADMINISTRATOR")) {
+			for(const perm of command.userPerms) {
+				if(!message.member.hasPermission(perm)) {
+					return safeSend(message, `Command requires you to have ${perm} permissions`);
+				}
 			}
 		}
-	}
 
-	// TODO: Check permissions for BOT and Channel Overrides:
-	// https://discordjs.guide/popular-topics/permissions.html#syncing-with-a-category
-	// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
-	if(command.botPerms && !message.guild.me.hasPermission("ADMINISTRATOR")) {
-		for(const perm of command.botPerms) {
-			if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
-				// console.log(message.guild.me.permissionsIn(message.channel).toArray())
-				return safeSend(message, `I need ${perm} permissions to run that command!`);
+		// TODO: Check permissions for BOT and Channel Overrides:
+		// https://discordjs.guide/popular-topics/permissions.html#syncing-with-a-category
+		// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
+		if(command.botPerms && !message.guild.me.hasPermission("ADMINISTRATOR")) {
+			for(const perm of command.botPerms) {
+				if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
+					// console.log(message.guild.me.permissionsIn(message.channel).toArray())
+					return safeSend(message, `I need ${perm} permissions to run that command!`);
+				}
 			}
 		}
 	}

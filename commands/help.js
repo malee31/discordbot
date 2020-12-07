@@ -8,6 +8,7 @@ module.exports = {
 	aliases: ['commands'],
 	botPerms: ["SEND_MESSAGES"],
 	usage: '[Command Name | Page Number]',
+	allowDM: true,
 	execute(message, args) {
 		let helpEmbed = new Discord.MessageEmbed()
 		.setTitle("Here are all my commands:")
