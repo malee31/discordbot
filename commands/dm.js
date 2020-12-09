@@ -6,9 +6,10 @@ module.exports = {
 	args: 1,
 	botPerms: ["SEND_MESSAGES"],
 	validate(message, args) {
-		if(/^<@!?[0-9]+>$/.test(args[0])) {
+		let mention = message.client.parseMention(args[0]);
+		if(mention) {
 			if(args.length === 1) return false;
-			args[0] = args[0].match(/(?<=^<@!?)[0-9]+(?=>$)/)[0];
+			args[0] = mention.id;
 		} else {
 			args.unshift(message.author.id);
 		}

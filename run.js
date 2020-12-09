@@ -15,6 +15,23 @@ client.devcommands = new Discord.Collection();
 //Make DB easily accessible by commands
 client.connection = connection;
 
+//Extend client to parse mention, role, and channel strings
+client.parseMention = (testString = "") => {
+	if(!/^<@!?[0-9]+>$/.test(testString)) return;
+	return {
+		id: testString.match(/(?<=^<@!?)[0-9]+(?=>$)/)[0],
+		hasNickname: testString[2] === "!"
+	};
+};
+client.parseRole = (testString = "") => {
+	if(!/^<#?[0-9]+>$/.test(testString)) return;
+	return testString.match(/(?<=^<#)[0-9]+(?=>$)/)[0];
+};
+client.parseChannel = (testString = "") => {
+	if(!/^<@&[0-9]+>$/.test(testString)) return;
+	return testString.match(/(?<=^<@&)[0-9]+(?=>$)/)[0];
+};
+
 async function startUp() {
 	console.log("Bot Starting Up");
 
@@ -23,13 +40,12 @@ async function startUp() {
 
 	console.log("Loading Bot Commands");
 	try {
-		// TODO: Test to make sure this works as intended and loads every command recursively and asynchronously
 		let commandPromises = [];
 		commandLoader(client.commands, path.resolve(__dirname, "./commands"), commandPromises);
 		commandLoader(client.commands, path.resolve(__dirname, "./plugins"), commandPromises);
 		commandLoader(client.devcommands, path.resolve(__dirname, "./devcommands"), commandPromises);
 		await Promise.all(commandPromises);
-		console.log("Loading commands finished");
+		console.log("Commands Successfully Loaded");
 	} catch(err) {
 		console.warn("Failed to load commands. Shutting down");
 		console.error(err);
