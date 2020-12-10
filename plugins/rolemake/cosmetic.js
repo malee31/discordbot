@@ -2,9 +2,9 @@ module.exports = {
 	name: "cosmetic",
 	aliases: ["empty"],
 	description: "Creates a role with no enabled permissions",
-	userPerms: ["MANAGE_ROLES"],
-	botPerms: ["MANAGE_ROLES"],
 	args: 1,
+	userPerms: ["MANAGE_ROLES"],
+	botPerms: ["MANAGE_ROLES", "SEND_MESSAGES"],
 	async execute(message, args) {
 		let newRole;
 		try {
@@ -19,7 +19,7 @@ module.exports = {
 				reason: `Empty role created with [rolemake cosmetic] command by ${message.author.tag}`
 
 			});
-		} catch (err) {
+		} catch(err) {
 			return message.channel.send(`Failed to create new cosmetic role`);
 		}
 

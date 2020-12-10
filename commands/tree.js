@@ -1,8 +1,8 @@
 module.exports = {
 	name: "tree",
 	description: "Sends the channel structure of the server",
-	usage: "[Bare (optional)]",
 	cooldown: 10,
+	usage: "[Bare (optional)]",
 	botPerms: ["SEND_MESSAGES"],
 	execute(message, args) {
 		let bare = args[0] && args[0].toLowerCase() === "bare";

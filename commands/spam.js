@@ -3,10 +3,10 @@ const config = require("../parts/config.json");
 module.exports = {
 	name: 'spam',
 	description: 'Spams a message repeatedly',
-	cooldown: 5,
-	usage: `[Number (default: ${config.minSpam})] [Message]`,
 	allowDM: true,
 	args: 1,
+	cooldown: 5,
+	usage: `[Number (default: ${config.minSpam})] [Message]`,
 	botPerms: ["SEND_MESSAGES"],
 	validate(message, args) {
 		let repeatNum = Number.parseInt(args[0]);

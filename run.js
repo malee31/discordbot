@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const path = require("path");
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -15,19 +15,26 @@ client.devcommands = new Discord.Collection();
 //Make DB easily accessible by commands
 client.connection = connection;
 
-//Extend client to parse mention, role, and channel strings
-client.parseMention = (testString = "") => {
+//Extend client to parse mention, role, emoji, and channel strings
+client.parseMention = (testString = '') => {
 	if(!/^<@!?[0-9]+>$/.test(testString)) return;
 	return {
 		id: testString.match(/(?<=^<@!?)[0-9]+(?=>$)/)[0],
-		hasNickname: testString[2] === "!"
+		hasNickname: testString[2] === '!'
 	};
 };
-client.parseRole = (testString = "") => {
+client.parseEmoji = (testString = '') => {
+	if(!/^<:\w+:[0-9]+>$/.test(testString)) return;
+	return {
+		emojiName: testString.match(/(?<=^<:)\w+(?=:[0-9]+>$)/)[0],
+		id: testString.match(/(?<=^<:\w+:)[0-9]+(?=>$)/)[0]
+	};
+};
+client.parseRole = (testString = '') => {
 	if(!/^<#?[0-9]+>$/.test(testString)) return;
 	return testString.match(/(?<=^<#)[0-9]+(?=>$)/)[0];
 };
-client.parseChannel = (testString = "") => {
+client.parseChannel = (testString = '') => {
 	if(!/^<@&[0-9]+>$/.test(testString)) return;
 	return testString.match(/(?<=^<@&)[0-9]+(?=>$)/)[0];
 };
@@ -62,12 +69,11 @@ async function safeSend(message, content) {
 	}
 }
 
-client.on('message', async message => {
+client.on("message", async message => {
 	if(!message.content || message.author.bot || message.webhookID || message.system) return;
 	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
 
 	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
-	// TODO: Fix bug where bot won't run in DMs because of message.guild being null in DMs
 	let prefix = process.env.testPrefix || await connection.getPrefix((message.guild ? message.guild.id : -1));
 	if(!message.content.startsWith(prefix) && !process.env.testPrefix && mentionPrefixPattern.test(message.content)) {
 		prefix = message.content.match(mentionPrefixPattern)[0];
@@ -82,8 +88,8 @@ client.on('message', async message => {
 	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 
-	if(message.channel.type === 'dm' && !command.allowDM) {
-		return safeSend(message, 'I can\'t execute that command inside DMs!');
+	if(message.channel.type === "dm" && !command.allowDM) {
+		return safeSend(message, "I can't execute that command inside DMs!");
 	}
 
 	if(message.guild) {
@@ -111,10 +117,10 @@ client.on('message', async message => {
 	}
 
 	if(typeof command.args === "number" && command.args > args.length) {
-		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? "" : "s"} are required.`;
+		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? '' : "s"} are required.`;
 
 		// Adds the proper usage of the command is it is provided in command.usage
-		if(command.usage) {
+		if(typeof command.usage === "string") {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 
@@ -143,7 +149,7 @@ client.on('message', async message => {
 	} catch(error) {
 		console.log("CAUGHT");
 		console.error(error);
-		await message.reply('There was an error trying to execute that command!');
+		await message.reply("There was an error trying to execute that command!");
 	}
 });
 
@@ -155,7 +161,7 @@ startUp().then(() => {
 	process.exit(1);
 });
 
-client.on('ready', () => {
+client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	mentionPrefixPattern = new RegExp(`<@!?${client.user.id}>`);
 	client.user.setPresence({

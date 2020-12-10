@@ -1,8 +1,8 @@
 module.exports = {
 	name: 'targetdm',
 	description: 'Makes the bot DM one specific user',
-	usage: '[@User or \'User#1234\'] [Message]',
 	args: 2,
+	usage: "[@User or 'User#1234'] [Message]",
 	botPerms: ["SEND_MESSAGES"],
 	validate(message, args) {
 		let searchedUser = message.client.parseMention(args[0]);

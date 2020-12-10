@@ -2,12 +2,13 @@ module.exports = {
 	name: "commandName",
 	aliases: ["commandName2"],
 	description: "commandDescription",
-	usage: "[Arguments]",
-	args: 0,
 	allowDM: true,
+	args: 0,
+	cooldown: 0,
+	usage: "[Arguments]",
 	userPerms: [],
 	botPerms: ["SEND_MESSAGES"],
-	validate() {
+	validate(message, args) {
 		return true;
 	},
 	execute(message, args) {

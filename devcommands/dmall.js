@@ -2,6 +2,8 @@ module.exports = {
 	name: "dmall",
 	description: "DMs everyone in the server that isn't a bot",
 	args: 1,
+	usage: "[Message]",
+	botPerms: ["SEND_MESSAGES"],
 	execute(message, args) {
 		let sentTo = [];
 		message.guild.members.cache.forEach(member => {
