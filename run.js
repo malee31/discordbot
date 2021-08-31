@@ -64,7 +64,7 @@ async function startUp() {
 }
 
 async function safeSend(message, content) {
-	if(message.channel.type === "dm" || message.guild.me.hasPermission("ADMINISTRATOR") || message.guild.me.hasPermission("SEND_MESSAGES") || message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES")) {
+	if(message.channel.type === "dm" || message.guild.me.permissions.has("ADMINISTRATOR") || message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES")) {
 		return message.channel.send(content);
 	}
 }
@@ -95,9 +95,9 @@ client.on("messageCreate", async message => {
 	if(message.guild) {
 		// Checks if the user has permission to use the command. Overridden by permission ADMINISTRATOR
 		// https://discord.js.org/#/docs/main/stable/class/Permissions?scrollTo=s-FLAGS
-		if(command.userPerms && !message.member.hasPermission("ADMINISTRATOR")) {
+		if(command.userPerms && !message.member.permissions.has("ADMINISTRATOR")) {
 			for(const perm of command.userPerms) {
-				if(!message.member.hasPermission(perm)) {
+				if(!message.member.permissions.has(perm)) {
 					return safeSend(message, `Command requires you to have ${perm} permissions`);
 				}
 			}
