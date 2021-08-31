@@ -1,7 +1,7 @@
 require("dotenv").config();
 const path = require("path");
 const Discord = require("discord.js");
-const client = new Discord.Client();
+const client = new Discord.Client({ intents: require("./IntentList.js") });
 const cmdParse = require("./parts/commandParse.js");
 const commandLoader = require("./parts/commandLoader");
 const commandSearcher = require("./parts/commandSearcher");
@@ -69,8 +69,8 @@ async function safeSend(message, content) {
 	}
 }
 
-client.on("message", async message => {
-	if(!message.content || message.author.bot || message.webhookID || message.system) return;
+client.on("messageCreate", async message => {
+	if(!message.content || message.author.bot || message.webhookId || message.system) return;
 	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
 
 	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
@@ -84,7 +84,7 @@ client.on("message", async message => {
 	// Disabled multi-command support. To re-enable, uncomment line and use a for loop
 	// let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 
-	let {command, args} = cmdParse(message.content.slice(prefix.length), prefix);
+	let { command, args } = cmdParse(message.content.slice(prefix.length), prefix);
 	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 
@@ -106,9 +106,9 @@ client.on("message", async message => {
 		// TODO: Check permissions for BOT and Channel Overrides:
 		// https://discordjs.guide/popular-topics/permissions.html#syncing-with-a-category
 		// https://discord.js.org/#/docs/main/stable/class/PermissionOverwrites
-		if(command.botPerms && !message.guild.me.hasPermission("ADMINISTRATOR")) {
+		if(command.botPerms && !message.guild.me.permissions.has("ADMINISTRATOR")) {
 			for(const perm of command.botPerms) {
-				if(!(message.guild.me.hasPermission(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
+				if(!(message.guild.me.permissions.has(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
 					// console.log(message.guild.me.permissionsIn(message.channel).toArray())
 					return safeSend(message, `I need ${perm} permissions to run that command!`);
 				}
@@ -164,19 +164,14 @@ startUp().then(() => {
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	mentionPrefixPattern = new RegExp(`<@!?${client.user.id}>`);
+	// ClientUser.setPresence has become fire-and-forget so there is no checks for whether it has been set successfully anymore
 	client.user.setPresence({
-		activity: {
+		activities: [{
 			type: "LISTENING",
 			name: "You While Being Updated"
-		},
+		}],
 		status: "online",
 		afk: false
-	})
-	.then(() => {
-		console.log("Successfully Set Presence");
-	}).catch(err => {
-		console.warn("Failed to Set Presence");
-		console.error(err);
 	});
 });
 
