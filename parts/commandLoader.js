@@ -43,6 +43,7 @@ function loadCommands(commandCollection, absolutePath, PromiseCollection) {
 		if(fileName.endsWith(".js")) {
 			const loadedCommand = require(itemPath);
 			commandCollection.set(loadedCommand.name, loadedCommand);
+			if(itemPath.endsWith("regex.js")) console.log(loadedCommand.name);
 
 			//Create cooldown table or collection if needed
 			if(typeof loadedCommand.cooldown === "number" && loadedCommand.cooldown > 0) {

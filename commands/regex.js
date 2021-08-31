@@ -1,4 +1,6 @@
-module.exports = {
+const {CommandTemplate} = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: "regex",
 	aliases: ["match"],
 	description: "Sends a list of members who's username and discriminator match the pattern",
@@ -15,4 +17,4 @@ module.exports = {
 		});
 		return message.channel.send(`${response}All matched the expression`);
 	},
-};
+});
