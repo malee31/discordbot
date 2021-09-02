@@ -6,7 +6,7 @@ module.exports = {
 	async execute(message, args) {
 		// console.log(`Setting prefix to [${args[0]}]`)
 		let reply;
-		if(args.length === 0 || !message.member.hasPermission("MANAGE_GUILD")) {
+		if(args.length === 0 || !message.member.permissions.has("MANAGE_GUILD")) {
 			let prefix = await message.client.connection.getPrefix(message.guild.id);
 			reply = `${args.length === 0 ? '' : "You need MANAGE_GUILD permissions to change the prefix!\n"}The prefix for this server is \`${prefix}\`\nUse \`${prefix}prefix [New Prefix]\` to change it`;
 		} else {

@@ -11,9 +11,9 @@ module.exports = {
 	allowDM: true,
 	execute(message, args) {
 		let helpEmbed = new Discord.MessageEmbed()
-		.setTitle("Here are all my commands:")
-		.setFooter(`You can send "${message.prefix}help [command name]" to get info on a specific command!`)
-		.setColor("#808080");
+			.setTitle("Here are all my commands:")
+			.setFooter(`You can send "${message.prefix}help [command name]" to get info on a specific command!`)
+			.setColor("#808080");
 
 		cacheInfo(commandDetails, message.client.commands);
 
@@ -25,7 +25,7 @@ module.exports = {
 			singular(helpEmbed, commandDetails, message.prefix, args);
 		}
 
-		return message.channel.send(helpEmbed);
+		return message.channel.send({ embeds: [helpEmbed] });
 	},
 };
 
@@ -64,11 +64,11 @@ function paginate(embed, commandArray, pageNum) {
 	if(isNaN(pageNum)) pageNum = 1;
 	if(pageNum > Math.ceil(commandArray.length / 10)) {
 		embed
-		.setTitle(`There are only ${Math.ceil(commandArray.length / 10)} help pages!`)
-		.setDescription("Type a valid number of pages for help");
+			.setTitle(`There are only ${Math.ceil(commandArray.length / 10)} help pages!`)
+			.setDescription("Type a valid number of pages for help");
 	} else {
 		embed
-		.setFooter(`${embed.footer.text}   •   Page ${pageNum} of ${Math.ceil(commandArray.length / 10)}`);
+			.setFooter(`${embed.footer.text}   •   Page ${pageNum} of ${Math.ceil(commandArray.length / 10)}`);
 
 		pageNum--;
 		for(let commandNum = 0; commandNum < 10; commandNum++) {

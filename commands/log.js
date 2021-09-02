@@ -16,6 +16,6 @@ module.exports = {
 
 		message.delete();
 
-		return message.channel.send(logEmbed);
+		return message.channel.send({embeds: [logEmbed]});
 	},
 };

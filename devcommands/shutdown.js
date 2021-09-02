@@ -6,7 +6,7 @@ module.exports = {
 	usage: "",
 	validate(message) {
 		console.log(`Shutdown requested by: ${message.author.username}#${message.author.discriminator}`);
-		if(!message.member.hasPermission("ADMINISTRATOR") && message.author.id !== process.env.owner) {
+		if(!message.member.permissions.has("ADMINISTRATOR") && message.author.id !== process.env.owner) {
 			message.reply("You don't have the permission to use this command.");
 			return false;
 		}

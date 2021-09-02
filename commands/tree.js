@@ -8,10 +8,11 @@ module.exports = {
 		let bare = args[0] && args[0].toLowerCase() === "bare";
 		let tree = {};
 		message.guild.channels.cache.forEach((channel, key, cache) => {
-			if(channel.type === "category" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
-			else if(channel.type !== "category") {
+			console.log(channel);
+			if(channel.type === "GUILD_CATEGORY" && !Array.isArray(tree[channel.name])) tree[channel.name] = [];
+			else if(channel.type !== "GUILD_CATEGORY") {
 				//console.log("Checking", channel, "Got", cache.get(channel.parentID));
-				tree[cache.get(channel.parentID).name].push(channel.name);
+				tree[cache.get(channel.parentId).name].push(channel.name);
 			}
 		});
 		let treeAssembly = message.guild.name + "\n";

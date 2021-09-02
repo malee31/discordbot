@@ -7,12 +7,11 @@ module.exports = {
 	botPerms: ["SEND_MESSAGES"],
 	args: 2,
 	execute(message, args) {
-		let textEmbed = new Discord.MessageEmbed()
-		.setColor('#808080');
+		let textEmbed = new Discord.MessageEmbed().setColor('#808080');
 
 		textEmbed.setTitle(args[0]);
 		textEmbed.setDescription(args[1]);
 
-		return message.channel.send(textEmbed);
+		return message.channel.send({ embeds: [textEmbed] });
 	},
 };
