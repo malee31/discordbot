@@ -8,14 +8,14 @@ module.exports = {
 	args: 1,
 	execute(message, args) {
 		let logEmbed = new Discord.MessageEmbed()
-		.setColor('#808080');
+			.setColor('#808080');
 
-		logEmbed.setAuthor(`${message.author.tag}`, message.author.displayAvatarURL({dynamic: true}))
+		logEmbed.setAuthor(`${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }))
 		logEmbed.setDescription(args.join(" "));
 		logEmbed.setTimestamp(message.createdAt);
 
 		message.delete();
 
-		return message.channel.send({embeds: [logEmbed]});
+		return message.channel.send({ embeds: [logEmbed] });
 	},
 };
