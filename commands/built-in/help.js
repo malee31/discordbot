@@ -1,8 +1,9 @@
 const Discord = require("discord.js");
-const timeFormat = require('../parts/timeFormat');
+const timeFormat = require('../../parts/timeFormat.js');
+const { CommandTemplate } = require("../../index.js");
 
 const commandDetails = [];
-module.exports = {
+module.exports = new CommandTemplate({
 	name: 'help',
 	description: 'List all of my commands or info about a specific command.',
 	aliases: ['commands'],
@@ -27,7 +28,7 @@ module.exports = {
 
 		return message.channel.send({ embeds: [helpEmbed] });
 	},
-};
+});
 
 function cacheInfo(targetArray, commands) {
 	if(commandDetails.length === 0 || commandDetails !== targetArray) {
@@ -109,4 +110,4 @@ function singular(embed, searchArray, prefix, args, argNum = 0) {
 	} else {
 		singular(embed, command.subcommands, prefix, args, argNum + 1);
 	}
-}
+};

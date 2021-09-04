@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../../../index.js");
+
+module.exports = new CommandTemplate({
 	name: "cosmetic",
 	aliases: ["empty"],
 	description: "Creates a role with no enabled permissions",
@@ -24,4 +26,4 @@ module.exports = {
 
 		return message.channel.send(`Created cosmetic role ${newRole.toString()}`);
 	}
-};
+});

@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../../index.js");
+
+module.exports = new CommandTemplate({
 	name: 'shutdown',
 	aliases: ["sd", "poweroff", "power-off"],
 	description: 'Shutdown the bot for maintenance. Requires permission ADMINISTRATOR',
@@ -19,4 +21,4 @@ module.exports = {
 			process.exit();
 		});
 	},
-};
+});

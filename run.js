@@ -3,10 +3,10 @@ const path = require("path");
 const Discord = require("discord.js");
 const client = new Discord.Client({ intents: require("./IntentList.js") });
 const cmdParse = require("./parts/commandParse.js");
-const commandLoader = require("./parts/commandLoader");
-const commandSearcher = require("./parts/commandSearcher");
-const connection = require("./database/mysqlConnection");
-const cooldownManager = require("./database/cooldownManager");
+const commandLoader = require("./parts/commandLoader.js");
+const commandSearcher = require("./parts/commandSearcher.js");
+const connection = require("./database/mysqlConnection.js");
+const cooldownManager = require("./database/cooldownManager.js");
 let mentionPrefixPattern;
 
 //Commands and ADMIN ONLY commands are loaded into these two collections respectively
@@ -48,9 +48,9 @@ async function startUp() {
 	console.log("Loading Bot Commands");
 	try {
 		let commandPromises = [];
-		commandLoader(client.commands, path.resolve(__dirname, "./commands"), commandPromises);
-		commandLoader(client.commands, path.resolve(__dirname, "./plugins"), commandPromises);
-		commandLoader(client.devcommands, path.resolve(__dirname, "./devcommands"), commandPromises);
+		commandLoader(client.commands, path.resolve(__dirname, "commands/built-in"), commandPromises);
+		commandLoader(client.commands, path.resolve(__dirname, "commands/plugins"), commandPromises);
+		commandLoader(client.devcommands, path.resolve(__dirname, "commands/owner-only"), commandPromises);
 		await Promise.all(commandPromises);
 		console.log("Commands Successfully Loaded");
 	} catch(err) {

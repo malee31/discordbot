@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../../index.js");
+
+module.exports = new CommandTemplate({
 	name: "dmall",
 	description: "DMs everyone in the server that isn't a bot",
 	args: 1,
@@ -14,4 +16,4 @@ module.exports = {
 		});
 		console.log(`Sent ${args.join(" ")} to entire ${message.guild.name} server:\n${sentTo.join("\n")}`);
 	},
-};
+});

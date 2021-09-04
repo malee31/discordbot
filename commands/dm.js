@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: "dm",
 	aliases: ["send", "sendto", "message"],
 	description: "Sends a DM to a specified person or yourself",
@@ -25,4 +27,4 @@ module.exports = {
 			target.send(args.join(" "))
 		]);
 	}
-};
+});

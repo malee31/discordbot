@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: "profile",
 	description: "Sends your profile picture to the channel",
 	allowDM: true,
@@ -6,4 +8,4 @@ module.exports = {
 	execute(message) {
 		return message.channel.send(`${message.author.displayAvatarURL({ dynamic: true })}`);
 	},
-};
+});

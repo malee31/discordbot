@@ -1,6 +1,7 @@
 const config = require("../parts/config.json");
+const { CommandTemplate } = require("../index.js");
 
-module.exports = {
+module.exports = new CommandTemplate({
 	name: 'spam',
 	description: 'Spams a message repeatedly',
 	allowDM: true,
@@ -21,4 +22,4 @@ module.exports = {
 			message.channel.send(text);
 		}
 	},
-};
+});

@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../../index.js");
+
+module.exports = new CommandTemplate({
 	name: "prefix",
 	description: "Set a new prefix for the bot to respond to. Bot will still respond to its own mention. Prefix cannot contain spaces",
 	usage: "[New Prefix (optional)]",
@@ -20,4 +22,4 @@ module.exports = {
 		}
 		return message.channel.send(reply);
 	}
-};
+});

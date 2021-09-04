@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: "tree",
 	description: "Sends the channel structure of the server",
 	cooldown: 10,
@@ -28,4 +30,4 @@ module.exports = {
 		//console.log(treeAssembly)
 		return message.channel.send(treeAssembly);
 	},
-};
+});

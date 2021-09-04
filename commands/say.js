@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: "say",
 	aliases: ["echo"],
 	description: "The bot will repeat what you tell it to say",
@@ -9,4 +11,4 @@ module.exports = {
 	execute(message, args) {
 		return message.channel.send(args.join(" "));
 	},
-};
+});

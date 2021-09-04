@@ -1,6 +1,8 @@
 const Discord = require("discord.js");
 
-module.exports = {
+const { CommandTemplate } = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: "log",
 	description: "Converts your message into an embed and deletes your original message if possible",
 	usage: "[Message]",
@@ -18,4 +20,4 @@ module.exports = {
 
 		return message.channel.send({ embeds: [logEmbed] });
 	},
-};
+});

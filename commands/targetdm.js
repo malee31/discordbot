@@ -1,4 +1,6 @@
-module.exports = {
+const { CommandTemplate } = require("../index.js");
+
+module.exports = new CommandTemplate({
 	name: 'targetdm',
 	description: 'Makes the bot DM one specific user',
 	args: 2,
@@ -18,4 +20,4 @@ module.exports = {
 
 		return message.channel.send("DM sent");
 	},
-};
+});
