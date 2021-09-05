@@ -1,5 +1,5 @@
-const config = require("../parts/config.json");
-const { CommandTemplate } = require("../index.js");
+const config = require("../../../parts/config.json");
+const { CommandTemplate } = require("../../../index.js");
 
 module.exports = new CommandTemplate({
 	name: 'spam',

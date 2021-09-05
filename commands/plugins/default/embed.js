@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const { CommandTemplate } = require("../index.js");
+const { CommandTemplate } = require("../../../index.js");
 
 module.exports = new CommandTemplate({
 	name: "embed",
