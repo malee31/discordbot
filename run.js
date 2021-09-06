@@ -1,43 +1,13 @@
 require("dotenv").config();
 const path = require("path");
 const Discord = require("discord.js");
-const client = new Discord.Client({ intents: require("./IntentList.js") });
+const utils = require("./parts/utils.js");
+const client = utils.extendClient(new Discord.Client({ intents: require("./IntentList.js") }));
 const cmdParse = require("./parts/commandParse.js");
 const commandLoader = require("./parts/commandLoader.js");
 const commandSearcher = require("./parts/commandSearcher.js");
-const connection = require("./database/mysqlConnection.js");
 const cooldownManager = require("./database/cooldownManager.js");
 let mentionPrefixPattern;
-
-//Commands and ADMIN ONLY commands are loaded into these two collections respectively
-client.commands = new Discord.Collection();
-client.devcommands = new Discord.Collection();
-//Make DB easily accessible by commands
-client.connection = connection;
-
-//Extend client to parse mention, role, emoji, and channel strings
-client.parseMention = (testString = '') => {
-	if(!/^<@!?[0-9]+>$/.test(testString)) return;
-	return {
-		id: testString.match(/(?<=^<@!?)[0-9]+(?=>$)/)[0],
-		hasNickname: testString[2] === '!'
-	};
-};
-client.parseEmoji = (testString = '') => {
-	if(!/^<:\w+:[0-9]+>$/.test(testString)) return;
-	return {
-		emojiName: testString.match(/(?<=^<:)\w+(?=:[0-9]+>$)/)[0],
-		id: testString.match(/(?<=^<:\w+:)[0-9]+(?=>$)/)[0]
-	};
-};
-client.parseRole = (testString = '') => {
-	if(!/^<#?[0-9]+>$/.test(testString)) return;
-	return testString.match(/(?<=^<#)[0-9]+(?=>$)/)[0];
-};
-client.parseChannel = (testString = '') => {
-	if(!/^<@&[0-9]+>$/.test(testString)) return;
-	return testString.match(/(?<=^<@&)[0-9]+(?=>$)/)[0];
-};
 
 async function startUp() {
 	console.log("Bot Starting Up");
@@ -70,14 +40,12 @@ async function safeSend(message, content) {
 }
 
 client.on("messageCreate", async message => {
-	if(!message.content || message.author.bot || message.webhookId || message.system) return;
+	if(message.author.bot || message.webhookId || message.system) return;
 	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
 
 	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
 	let prefix = process.env.testPrefix || await connection.getPrefix((message.guild ? message.guild.id : -1));
-	if(!message.content.startsWith(prefix) && !process.env.testPrefix && mentionPrefixPattern.test(message.content)) {
-		prefix = message.content.match(mentionPrefixPattern)[0];
-	}
+	if(mentionPrefixPattern.test(message.content)) prefix = message.content.match(mentionPrefixPattern)[0];
 
 	if(!message.content.startsWith(prefix)) return;
 
@@ -173,8 +141,4 @@ client.on("ready", () => {
 		status: "online",
 		afk: false
 	});
-});
-
-client.once("disconnect", () => {
-	console.log("Disconnecting. Goodbye!");
 });
