@@ -54,7 +54,7 @@ class CommandTemplate {
 		for(const key in commandData) {
 			if(!commandData.hasOwnProperty(key)) continue;
 
-			if(!this.CommandData[key]) {
+			if(this.CommandData[key] === undefined) {
 				console.warn(`Constructor for CommandTemplate does not use the [${key}] property\nRefrain from attaching unused keys to the command object`);
 				continue;
 			}
