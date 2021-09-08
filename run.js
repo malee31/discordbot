@@ -7,7 +7,6 @@ const cmdParse = require("./parts/commandParse.js");
 const commandLoader = require("./parts/commandLoader.js");
 const commandSearcher = require("./parts/commandSearcher.js");
 const cooldownManager = require("./database/cooldownManager.js");
-let mentionPrefixPattern;
 
 async function startUp() {
 	console.log("Bot Starting Up");
@@ -29,14 +28,8 @@ async function startUp() {
 		process.exit(1);
 	}
 
-	console.log("Bot Login");
+	console.log("Bot Logging In");
 	return client.login(process.env.discordtoken);
-}
-
-async function safeSend(message, content) {
-	if(message.channel.type === "dm" || message.guild.me.permissions.has("ADMINISTRATOR") || message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES")) {
-		return message.channel.send(content);
-	}
 }
 
 client.on("messageCreate", async message => {
@@ -44,8 +37,8 @@ client.on("messageCreate", async message => {
 	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
 
 	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
-	let prefix = process.env.testPrefix || await connection.getPrefix((message.guild ? message.guild.id : -1));
-	if(mentionPrefixPattern.test(message.content)) prefix = message.content.match(mentionPrefixPattern)[0];
+	let prefix = process.env.testPrefix || await client.connection.getPrefix((message.guild ? message.guild.id : -1));
+	if(client.mentionPattern.test(message.content)) prefix = message.content.match(client.mentionPattern)[0];
 
 	if(!message.content.startsWith(prefix)) return;
 
@@ -57,7 +50,7 @@ client.on("messageCreate", async message => {
 	if(command === false) return;
 
 	if(message.channel.type === "dm" && !command.allowDM) {
-		return safeSend(message, "I can't execute that command inside DMs!");
+		return utils.safeSend(message, "I can't execute that command inside DMs!");
 	}
 
 	if(message.guild) {
@@ -66,7 +59,7 @@ client.on("messageCreate", async message => {
 		if(command.userPerms && !message.member.permissions.has("ADMINISTRATOR")) {
 			for(const perm of command.userPerms) {
 				if(!message.member.permissions.has(perm)) {
-					return safeSend(message, `Command requires you to have ${perm} permissions`);
+					return utils.safeSend(message, `Command requires you to have ${perm} permissions`);
 				}
 			}
 		}
@@ -78,7 +71,7 @@ client.on("messageCreate", async message => {
 			for(const perm of command.botPerms) {
 				if(!(message.guild.me.permissions.has(perm) || message.guild.me.permissionsIn(message.channel).has(perm))) {
 					// console.log(message.guild.me.permissionsIn(message.channel).toArray())
-					return safeSend(message, `I need ${perm} permissions to run that command!`);
+					return utils.safeSend(message, `I need ${perm} permissions to run that command!`);
 				}
 			}
 		}
@@ -92,7 +85,7 @@ client.on("messageCreate", async message => {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 
-		return safeSend(message, reply);
+		return utils.safeSend(message, reply);
 	}
 
 	// Validation for supplied argument types and values if a function exists for it
@@ -105,7 +98,7 @@ client.on("messageCreate", async message => {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 
-		return safeSend(message, reply);
+		return utils.safeSend(message, reply);
 	}
 
 	// Handles the cooldowns. Checks and sets cooldowns based on command.cooldown if it is set
@@ -124,21 +117,7 @@ client.on("messageCreate", async message => {
 startUp().then(() => {
 	console.log("Start Up Sequence Complete");
 }).catch(err => {
-	console.warn("Could not login bot");
+	console.warn("Bot Login Failed");
 	console.error(err);
 	process.exit(1);
-});
-
-client.on("ready", () => {
-	console.log(`Logged in as ${client.user.tag}!`);
-	mentionPrefixPattern = new RegExp(`<@!?${client.user.id}>`);
-	// ClientUser.setPresence has become fire-and-forget so there is no checks for whether it has been set successfully anymore
-	client.user.setPresence({
-		activities: [{
-			type: "LISTENING",
-			name: "You While Being Updated"
-		}],
-		status: "online",
-		afk: false
-	});
 });
