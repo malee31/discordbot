@@ -45,7 +45,7 @@ client.on("messageCreate", async message => {
 	// Disabled multi-command support. To re-enable, uncomment line and use a for loop
 	// let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 
-	let { command, args } = cmdParse(message.content.slice(prefix.length), prefix);
+	let { command, args } = cmdParse(message.content.slice(prefix.length), { prefix });
 	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 
