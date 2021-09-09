@@ -51,8 +51,8 @@ module.exports = function parseArguments(argArray, parsePattern) {
 				if(isNaN(argArray[index])) console.log("Not able to parse as float/decimal, defaulted to string: " + argArray[index]);
 				else argArray[index] = Number.parseFloat(argArray[index]);
 				break;
-			/*case 's':
-			default:*/
+			// case 's':
+			// default:
 		}
 	}
 

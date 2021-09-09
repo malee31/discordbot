@@ -1,14 +1,14 @@
 module.exports = function timeFormat(time) {
-	let units = "seconds";
+	let unit;
 
-	if(time / 3600 >= 1) {
-		time = time / 3600;
-		units = time === 1 ? "hour" : "hours";
-	} else if(time / 60 >= 1) {
-		time = time / 60;
-		units = time === 1 ? "minute" : "minutes";
-	} else if(time === 1) {
-		units = "second";
+	if(time >= 3600) {
+		time /= 3600;
+		unit = time === 1 ? "hour" : "hours";
+	} else if(time >= 60) {
+		time /= 60;
+		unit = time === 1 ? "minute" : "minutes";
+	} else {
+		unit = time === 1 ? "second" : "seconds";
 	}
-	return `${time.toFixed(1)} ${units}`;
+	return `${time.toFixed(1)} ${unit}`;
 }

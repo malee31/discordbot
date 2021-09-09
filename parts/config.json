@@ -17,7 +17,6 @@
 			}
 		}
 	},
-	"substitutionPlaceholder": "substitutionplaceholder",
 	"minSpam": 1,
 	"maxSpam": 10
 }

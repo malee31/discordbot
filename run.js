@@ -33,24 +33,19 @@ async function startUp() {
 }
 
 client.on("messageCreate", async message => {
-	if(message.author.bot || message.webhookId || message.system) return;
-	if(process.env.testingserver && message.guild.name !== process.env.testingserver) return;
+	if(client.shouldIgnore(message)) return;
 
-	//Selects which prefix to use based on the following priority: Environment, Custom Guild Prefix, and @Bot Mention
-	let prefix = process.env.testPrefix || await client.connection.getPrefix((message.guild ? message.guild.id : -1));
-	if(client.mentionPattern.test(message.content)) prefix = message.content.match(client.mentionPattern)[0];
-
-	if(!message.content.startsWith(prefix)) return;
+	const prefix = client.extractPrefix(message);
+	if(prefix === undefined) return;
 
 	// Disabled multi-command support. To re-enable, uncomment line and use a for loop
 	// let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
-
 	let { command, args } = cmdParse(message.content.slice(prefix.length), { prefix });
 	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 
 	if(message.channel.type === "dm" && !command.allowDM) {
-		return utils.safeSend(message, "I can't execute that command inside DMs!");
+		return utils.safeSend(message, "This command is unavailable in DMs");
 	}
 
 	if(message.guild) {
@@ -77,8 +72,8 @@ client.on("messageCreate", async message => {
 		}
 	}
 
-	if(typeof command.args === "number" && command.args > args.length) {
-		let reply = `You didn't provide enough arguments, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? '' : "s"} are required.`;
+	if(args.length < command.args) {
+		let reply = `Not enough arguments provided, ${message.author.toString()}!\n At least ${command.args} argument${command.args === 1 ? '' : "s"} are required.`;
 
 		// Adds the proper usage of the command is it is provided in command.usage
 		if(typeof command.usage === "string") {
