@@ -14,16 +14,16 @@ async function startUp() {
 	// Creates the MySQL table for cooldowns if it doesn't already exist and doubles as a check to see if MySQL is turned on
 	await cooldownManager.createTable();
 
-	console.log("Loading Bot Commands");
 	try {
-		let commandPromises = [];
-		commandLoader(client.commands, path.resolve(__dirname, "commands/built-in"), commandPromises);
-		commandLoader(client.commands, path.resolve(__dirname, "commands/plugins"), commandPromises);
-		commandLoader(client.devcommands, path.resolve(__dirname, "commands/owner-only"), commandPromises);
-		await Promise.all(commandPromises);
+		console.log("Loading Bot Commands");
+		await Promise.all([
+			commandLoader(client.commands, path.resolve(__dirname, "commands/built-in")),
+			commandLoader(client.commands, path.resolve(__dirname, "commands/plugins")),
+			commandLoader(client.devcommands, path.resolve(__dirname, "commands/owner-only"))
+		]);
 		console.log("Commands Successfully Loaded");
 	} catch(err) {
-		console.warn("Failed to load commands. Shutting down");
+		console.warn("Failed to Load Commands - Shutting down...");
 		console.error(err);
 		process.exit(1);
 	}

@@ -8,64 +8,61 @@ const COMMAND_TOP_NAME = "commandTop";
 
 module.exports = loadCommands;
 
-// Loads all commands from a folder recursively as quickly as possible by taking advantage of the fact that arrays are
-// passed by reference rather than value so all Promises can be pushed into it for Promise.all([Promise Array])
+// Loads all commands from a folder recursively as quickly as possible by taking advantage of async functions
+// (Note: require() is synchronous and bottle-necks it a bit)
 // TODO: Load subcommands by category and chained arguments
-function loadCommands(commandCollection, absolutePath, promiseCollection) {
-	let commandFiles;
+async function loadCommands(commandCollection, absolutePath) {
+	const fileList = [];
 	try {
-		commandFiles = fs.readdirSync(absolutePath);
+		fileList.push(...await fs.promises.readdir(absolutePath));
 	} catch(err) {
-		if(err.code === "ENOENT") return console.warn(`Folder at path does not exist: ${absolutePath}`);
-		else throw err;
+		if(err.code === "ENOENT") {
+			console.warn(`Folder at path does not exist: ${absolutePath}`);
+			return Promise.resolve();
+		} else throw err;
 	}
 
-	if(commandFiles.includes(PLUGIN_CONFIG_NAME)) {
-		const pluginConfig = require(path.resolve(absolutePath, PLUGIN_CONFIG_NAME));
-		const pluginCollection = new Discord.Collection();
-		pluginCollection[PLUGIN_CONFIG_NAME] = pluginConfig;
+	if(fileList.includes(PLUGIN_CONFIG_NAME)) {
+		const pluginConfig = await fs.promises.readFile(path.resolve(absolutePath, PLUGIN_CONFIG_NAME)).then(data => JSON.parse(data.toString()));
+		commandCollection = new Discord.Collection();
 
-		const pluginNames = pluginConfig.aliases || [];
-		pluginNames.push(pluginConfig[COMMAND_TOP_NAME]);
-		for(const name of pluginNames) {
-			commandCollection.set(name, pluginCollection);
-		}
+		[pluginConfig[COMMAND_TOP_NAME], ...(pluginConfig.aliases || [])]
+			.forEach(alias => commandCollection.set(alias, commandCollection));
 
-		commandCollection = pluginCollection;
-		console.log(`Loaded plugin ${pluginConfig[COMMAND_TOP_NAME]} from ${absolutePath}`);
+		console.log(`Loading plugin ${pluginConfig[COMMAND_TOP_NAME]} from ${absolutePath}`);
 	}
 
-	for(const fileName of commandFiles) {
-		let itemPath = path.resolve(absolutePath, fileName);
-		if(fileName.endsWith(".js")) {
-			const loadedCommand = require(itemPath);
-			commandCollection.set(loadedCommand.name, loadedCommand);
+	return Promise.all(
+		fileList
+			.filter(fileName => fileName !== PLUGIN_CONFIG_NAME)
+			.map(fileName => path.resolve(absolutePath, fileName))
+			.map(filePath => {
+				if(!filePath.endsWith(".js")) {
+					return fs.promises.lstat(filePath).then(stat => {
+						if(!stat.isDirectory()) return console.log(`Path at ${filePath} is not a directory. Skipping...`);
 
-			//Create cooldown table or collection if needed
-			if(loadedCommand.cooldown > 0) {
-				const cooldownMake = cooldownManager.createCooldown(loadedCommand.name).catch(err => {
-					console.warn(`Failed to create cooldown for ${loadedCommand.name}`);
-					console.error(err);
-				});
-				if(Array.isArray(promiseCollection)) promiseCollection.push(cooldownMake);
-			}
-		} else {
-			const recurse = fs.promises.lstat(itemPath).then(stat => {
-				if(stat.isDirectory()) {
-					console.log("SEARCHING SUBDIRECTORY: " + itemPath);
-					try {
-						loadCommands(commandCollection, itemPath, promiseCollection);
-					} catch(err) {
-						console.warn(`Something went wrong loading commands from directory ${itemPath}`);
-						throw err;
-					}
-				} else console.log(`Item ${itemPath} is not a directory. Skipping...`);
-			}).catch(err => {
-				console.warn(`Something went wrong trying to load possible directory ${itemPath}`);
-				console.error(err);
-			});
+						console.log("SEARCHING SUBDIRECTORY: " + filePath);
+						try {
+							return loadCommands(commandCollection, filePath);
+						} catch(err) {
+							console.warn(`Something went wrong loading commands from directory ${filePath}`);
+							throw err;
+						}
+					});
+				}
+				const loadedCommand = require(filePath);
+				commandCollection.set(loadedCommand.name, loadedCommand);
 
-			if(Array.isArray(promiseCollection)) promiseCollection.push(recurse);
-		}
-	}
+				//Create cooldown table or collection if needed
+				if(loadedCommand.cooldown > 0) {
+					return cooldownManager.createCooldown(loadedCommand.name)
+						.catch(err => {
+							console.warn(`Failed to create cooldown for ${loadedCommand.name}`);
+							console.error(err);
+						});
+				}
+
+				return Promise.resolve();
+			})
+	);
 }
