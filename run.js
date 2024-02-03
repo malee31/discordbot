@@ -32,15 +32,16 @@ async function startUp() {
 	return client.login(process.env.discordtoken);
 }
 
-client.on("messageCreate", async message => {
+client.on(Discord.Events.MessageCreate, async message => {
 	if(client.shouldIgnore(message)) return;
 
-	const prefix = client.extractPrefix(message);
+	const prefix = await client.extractPrefix(message);
 	if(prefix === undefined) return;
 
 	// Disabled multi-command support. To re-enable, uncomment line and use a for loop
 	// let subcommands = message.content.slice(prefix.length).trim().split(/\|/g);
 	let { command, args } = cmdParse(message.content.slice(prefix.length), { prefix });
+	console.log({command, args});
 	command = commandSearcher(client, message, command, args);
 	if(command === false) return;
 

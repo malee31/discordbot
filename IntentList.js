@@ -1,20 +1,25 @@
-const Flags = require("discord.js").Intents.FLAGS;
+const { GatewayIntentBits } = require("discord.js");
 
 // Comment and uncomment to enable or disable
 module.exports = [
-	Flags.GUILDS,
-	Flags.GUILD_MEMBERS,
-	// Flags.GUILD_BANS,
-	Flags.GUILD_EMOJIS_AND_STICKERS,
-	// Flags.GUILD_INTEGRATIONS,
-	// Flags.GUILD_WEBHOOKS,
-	// Flags.GUILD_INVITES,
-	// Flags.GUILD_VOICE_STATES,
-	// Flags.GUILD_PRESENCES,
-	Flags.GUILD_MESSAGES,
-	Flags.GUILD_MESSAGE_REACTIONS,
-	// Flags.GUILD_MESSAGE_TYPING,
-	Flags.DIRECT_MESSAGES,
-	Flags.DIRECT_MESSAGE_REACTIONS,
-	// Flags.DIRECT_MESSAGE_TYPING
+	// GatewayIntentBits.AutoModerationConfiguration,
+	// GatewayIntentBits.AutoModerationExecution,
+	GatewayIntentBits.DirectMessageReactions,
+	// GatewayIntentBits.DirectMessageTyping,
+	GatewayIntentBits.DirectMessages,
+	// GatewayIntentBits.GuildBans,
+	GatewayIntentBits.GuildEmojisAndStickers,
+	// GatewayIntentBits.GuildIntegrations,
+	// GatewayIntentBits.GuildInvites,
+	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.GuildMessageReactions,
+	// GatewayIntentBits.GuildMessageTyping,
+	GatewayIntentBits.GuildMessages,
+	// GatewayIntentBits.GuildModeration,
+	// GatewayIntentBits.GuildPresences,
+	// GatewayIntentBits.GuildScheduledEvents,
+	// GatewayIntentBits.GuildVoiceStates,
+	// GatewayIntentBits.GuildWebhooks,
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.MessageContent
 ];
