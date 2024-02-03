@@ -4,9 +4,9 @@ const prefixTable = config.mysql.tables.prefix;
 let enabled = Boolean(config.mysql.enabled);
 
 const connectionPool = mysql.createPool({
-	host: "127.0.0.1",
-	user: "root",
-	password: "",
+	host: process.env.MYSQL_HOST,
+	user: process.env.MYSQL_USER,
+	password: process.env.MYSQL_PASSWORD,
 	database: config.mysql.database,
 	connectionLimit: 10,
 	queueLimit: 20
